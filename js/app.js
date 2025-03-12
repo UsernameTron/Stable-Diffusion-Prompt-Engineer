@@ -498,6 +498,180 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
     
+    // Kling AI Motion Prompt Generation
+    const generateKlingBtn = document.getElementById('generateKlingBtn');
+    const klingNaturalInput = document.getElementById('klingNaturalInput');
+    const klingMotionResult = document.getElementById('klingMotionResult');
+    const klingMotionPrompt = document.getElementById('klingMotionPrompt');
+    const copyKlingBtn = document.getElementById('copyKlingBtn');
+    
+    function generateKlingMotionPrompt() {
+        const inputText = klingNaturalInput.value.trim();
+        if (!inputText) {
+            alert('Please enter a motion description first.');
+            klingNaturalInput.focus();
+            return;
+        }
+        
+        // Process the input to focus on motion aspects
+        let motionPrompt = processMotionInput(inputText);
+        
+        // Display the result
+        klingMotionPrompt.textContent = motionPrompt;
+        klingMotionResult.style.display = 'block';
+    }
+    
+    function processMotionInput(input) {
+        // Extract movement related words and phrases
+        const movementTerms = [
+            'slowly', 'quickly', 'gradually', 'moves', 'moving', 'turns', 'turning', 'spins', 
+            'zooms', 'pans', 'tilts', 'rotates', 'shifts', 'sways', 'flows', 'drifts',
+            'camera', 'angle', 'perspective', 'view', 'shot'
+        ];
+        
+        // Look for motion words in the input
+        let hasMotionTerms = movementTerms.some(term => input.toLowerCase().includes(term));
+        
+        // If no clear motion terms, add suggestions
+        if (!hasMotionTerms) {
+            return `${input}, camera slowly zooms in, subtle movement`;
+        }
+        
+        // Format motion-related content
+        let formattedPrompt = input;
+        
+        // Emphasize camera movements
+        formattedPrompt = formattedPrompt.replace(/(camera\s+\w+)/gi, match => match);
+        
+        // Ensure the prompt is structured for motion
+        if (!formattedPrompt.toLowerCase().includes('camera') && 
+            !formattedPrompt.toLowerCase().includes('zoom') && 
+            !formattedPrompt.toLowerCase().includes('pan')) {
+            formattedPrompt += ', subtle camera movement';
+        }
+        
+        return formattedPrompt;
+    }
+    
+    if (generateKlingBtn) {
+        generateKlingBtn.addEventListener('click', generateKlingMotionPrompt);
+    }
+    
+    if (copyKlingBtn) {
+        copyKlingBtn.addEventListener('click', () => copyToClipboard(klingMotionPrompt.textContent));
+    }
+    
+    // Quick Prompt Generator (Simple Mode)
+    const quickGenerateBtn = document.getElementById('quickGenerateBtn');
+    const naturalPromptInput = document.getElementById('naturalPromptInput');
+    const quickModelSelect = document.getElementById('quickModelSelect');
+    const stylePreference = document.getElementById('stylePreference');
+    const quickResults = document.getElementById('quickResults');
+    const quickPromptOutput = document.getElementById('quickPromptOutput');
+    const quickNegativeOutput = document.getElementById('quickNegativeOutput');
+    const quickParameters = document.getElementById('quickParameters');
+    const copyQuickPromptBtn = document.getElementById('copyQuickPromptBtn');
+    const copyQuickNegativeBtn = document.getElementById('copyQuickNegativeBtn');
+    
+    // Style enhancers based on preference
+    const styleEnhancers = {
+        photorealistic: 'photorealistic, highly detailed, professional photography, sharp focus, realistic lighting',
+        artistic: 'artistic, painterly style, creative, beautiful composition, vibrant colors',
+        cinematic: 'cinematic, movie still, dramatic lighting, professional color grading, high budget production',
+        anime: 'anime style, cel shading, vibrant colors, detailed illustration, manga inspired',
+        fantasy: 'fantasy art, magical, ethereal, mystical atmosphere, dreamlike quality'
+    };
+    
+    function detectContentType(input) {
+        const input_lower = input.toLowerCase();
+        
+        // Content type detection based on keywords
+        if (input_lower.includes('portrait') || 
+            input_lower.includes('person') || 
+            input_lower.includes('woman') || 
+            input_lower.includes('man') || 
+            input_lower.includes('face') || 
+            input_lower.includes('character')) {
+            return 'portrait';
+        } else if (input_lower.includes('landscape') || 
+                  input_lower.includes('mountain') || 
+                  input_lower.includes('forest') || 
+                  input_lower.includes('beach') || 
+                  input_lower.includes('ocean') || 
+                  input_lower.includes('sunset') || 
+                  input_lower.includes('nature')) {
+            return 'landscape';
+        } else if (input_lower.includes('abstract') || 
+                  input_lower.includes('surreal') || 
+                  input_lower.includes('dream')) {
+            return 'abstract';
+        } else if (input_lower.includes('anime') || 
+                  input_lower.includes('manga') || 
+                  input_lower.includes('cartoon')) {
+            return 'anime';
+        } else if (input_lower.includes('concept') || 
+                  input_lower.includes('design') || 
+                  input_lower.includes('sci-fi') || 
+                  input_lower.includes('futuristic')) {
+            return 'concept';
+        }
+        
+        // Default
+        return 'concept';
+    }
+    
+    function generateQuickPrompts() {
+        const inputText = naturalPromptInput.value.trim();
+        if (!inputText) {
+            alert('Please enter a description first.');
+            naturalPromptInput.focus();
+            return;
+        }
+        
+        const model = quickModelSelect.value;
+        const style = stylePreference.value;
+        
+        // Detect content type
+        const contentType = detectContentType(inputText);
+        
+        // Generate optimized prompt
+        let optimizedPrompt = inputText;
+        const styleEnhancer = styleEnhancers[style] || '';
+        const qualityEnhancer = qualityEnhancers[model] || '';
+        
+        // Add style and quality enhancers
+        optimizedPrompt = `${optimizedPrompt}, ${styleEnhancer}, ${qualityEnhancer}`;
+        
+        // Generate negative prompt
+        const negativePrompt = defaultNegativePrompts[model] || '';
+        
+        // Get recommended parameters
+        const recommended = modelSettings[model]?.[contentType] || { cfg: 7.5, steps: 30, sampler: 'euler_a' };
+        
+        // Display results
+        quickPromptOutput.textContent = optimizedPrompt;
+        quickNegativeOutput.textContent = negativePrompt;
+        
+        // Display recommended parameters
+        quickParameters.innerHTML = `
+            <p>CFG Scale: ${recommended.cfg} | Steps: ${recommended.steps} | Sampler: ${samplerDescriptions[recommended.sampler] || recommended.sampler}</p>
+        `;
+        
+        quickResults.style.display = 'block';
+    }
+    
+    if (quickGenerateBtn) {
+        quickGenerateBtn.addEventListener('click', generateQuickPrompts);
+    }
+    
+    if (copyQuickPromptBtn) {
+        copyQuickPromptBtn.addEventListener('click', () => copyToClipboard(quickPromptOutput.textContent));
+    }
+    
+    if (copyQuickNegativeBtn) {
+        copyQuickNegativeBtn.addEventListener('click', () => copyToClipboard(quickNegativeOutput.textContent));
+    }
+    
     // Initialize the page
     createModifierOptions();
     initParameterOptions();

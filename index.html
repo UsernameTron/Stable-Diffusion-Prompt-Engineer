@@ -139,6 +139,9 @@
                     <li class="nav-item" role="presentation">
                         <button class="nav-link" id="parameters-tab" data-bs-toggle="tab" data-bs-target="#parameters-content" type="button" role="tab">Parameters</button>
                     </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="kling-tab" data-bs-toggle="tab" data-bs-target="#kling-content" type="button" role="tab">Kling Motion</button>
+                    </li>
                 </ul>
                 
                 <!-- Tab content -->
@@ -262,6 +265,123 @@
                             </div>
                         </div>
                     </div>
+                    
+                    <!-- Kling AI Motion Tab -->
+                    <div class="tab-pane fade" id="kling-content" role="tabpanel">
+                        <div class="mb-3">
+                            <div class="alert alert-info">
+                                <strong>About Kling AI Motion:</strong> Designed for image-to-video motion prompts. Focus on describing movement rather than visual elements.
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Natural Language Description</label>
+                                <textarea class="form-control" id="klingNaturalInput" rows="3" placeholder="Describe the motion you want, e.g., 'the camera slowly zooms in as the character turns to face the viewer'"></textarea>
+                            </div>
+                            
+                            <div class="d-grid mb-3">
+                                <button class="btn btn-primary" id="generateKlingBtn">Generate Motion Prompt</button>
+                            </div>
+                            
+                            <div class="position-relative mb-3" id="klingMotionResult" style="display: none;">
+                                <label class="form-label">Motion Prompt</label>
+                                <div class="preview-box" id="klingMotionPrompt"></div>
+                                <button class="btn btn-sm btn-primary position-absolute top-0 end-0 m-2" id="copyKlingBtn">Copy</button>
+                            </div>
+                            
+                            <div class="row mt-4">
+                                <div class="col-md-6">
+                                    <h5>Tips for Good Motion Prompts</h5>
+                                    <ul class="small">
+                                        <li>Focus on <strong>movement</strong>, not static details</li>
+                                        <li>Specify camera movements (pan, tilt, zoom)</li>
+                                        <li>Include timing information (slow, fast, gradual)</li>
+                                        <li>Describe interactions with environment</li>
+                                        <li>Keep descriptions concise and specific</li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-6">
+                                    <h5>Recommended Settings</h5>
+                                    <ul class="small">
+                                        <li><strong>Image Fidelity:</strong> 0.6-0.8 for best balance</li>
+                                        <li><strong>Motion Strength:</strong> 0.7-0.9 for clear movement</li>
+                                        <li><strong>FPS:</strong> 20-30 for smooth motion</li>
+                                        <li>Use motion brush for specific movement paths</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="card" id="simpleMode">
+        <div class="card-header">Quick Prompt Generator</div>
+        <div class="card-body">
+            <div class="alert alert-primary">
+                Simply describe what you want to generate, and we'll create optimized prompts for you
+            </div>
+            
+            <div class="mb-3">
+                <label for="naturalPromptInput" class="form-label">Natural Language Description</label>
+                <textarea class="form-control" id="naturalPromptInput" rows="3" placeholder="Describe what you want to generate, e.g., 'a beautiful mountain landscape with a lake at sunset'"></textarea>
+            </div>
+            
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label class="form-label">Model</label>
+                    <select class="form-select" id="quickModelSelect">
+                        <option value="sdxl">Stable Diffusion XL</option>
+                        <option value="sd15">Stable Diffusion 1.5</option>
+                        <option value="sd21">Stable Diffusion 2.1</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Style Preference</label>
+                    <select class="form-select" id="stylePreference">
+                        <option value="photorealistic">Photorealistic</option>
+                        <option value="artistic">Artistic</option>
+                        <option value="cinematic">Cinematic</option>
+                        <option value="anime">Anime</option>
+                        <option value="fantasy">Fantasy</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="d-grid gap-2">
+                <button class="btn btn-primary btn-lg" id="quickGenerateBtn">Generate Prompts</button>
+            </div>
+            
+            <div id="quickResults" style="display: none;">
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <span>Positive Prompt</span>
+                                <button class="btn btn-sm btn-outline-primary" id="copyQuickPromptBtn">Copy</button>
+                            </div>
+                            <div class="card-body">
+                                <div class="preview-box" id="quickPromptOutput"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <span>Negative Prompt</span>
+                                <button class="btn btn-sm btn-outline-primary" id="copyQuickNegativeBtn">Copy</button>
+                            </div>
+                            <div class="card-body">
+                                <div class="preview-box" id="quickNegativeOutput"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="alert alert-success mt-3">
+                    <strong>Recommended Parameters</strong>
+                    <div id="quickParameters"></div>
                 </div>
             </div>
         </div>
