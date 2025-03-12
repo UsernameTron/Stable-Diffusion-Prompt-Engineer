@@ -22,6 +22,8 @@
                 <li><a href="#" data-tab="result-analyzer">Result Analyzer</a></li>
                 <li><a href="#" data-tab="advanced-techniques">Advanced Techniques</a></li>
                 <li><a href="#" data-tab="content-templates">Content Templates</a></li>
+                <li><a href="#" data-tab="openart-generator">OpenArt AI Generator</a></li>
+                <li><a href="#" data-tab="kling-motion">Kling AI Motion</a></li>
                 <li><a href="#" data-tab="openart-models">OpenArt AI Models</a></li>
                 <li><a href="#" data-tab="controlnet-guidance">ControlNet Guidance</a></li>
             </ul>
@@ -50,6 +52,102 @@
                 <div class="panel">
                     <h3>Model information demo</h3>
                     <p>Click on each model to see it selected. This demonstrates that all the models are properly added to the UI.</p>
+                </div>
+            </div>
+            
+            <!-- OpenArt Prompt Generator Tab -->
+            <div id="openart-generator" class="tab-content">
+                <h2>OpenArt AI Prompt Generator</h2>
+                <p>Generate prompts optimized for OpenArt AI models</p>
+                
+                <div class="model-selector">
+                    <div class="model-button active" data-model="juggernautxl">Juggernaut XL</div>
+                    <div class="model-button" data-model="fluxdev">Flux (Dev)</div>
+                    <div class="model-button" data-model="juggernautfluxpro">Juggernaut Flux Pro</div>
+                    <div class="model-button" data-model="fluxpro">Flux (Pro)</div>
+                    <div class="model-button" data-model="sdxlfilm">SDXL Film</div>
+                </div>
+                
+                <div class="panel">
+                    <h3>Prompt Information</h3>
+                    <p>Enter your prompt details below to generate an optimized prompt for the selected model:</p>
+                    
+                    <div class="form-group">
+                        <label for="openart-subject">Main Subject:</label>
+                        <input type="text" id="openart-subject" placeholder="What is the main subject of your image?">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="openart-details">Additional Details:</label>
+                        <textarea id="openart-details" placeholder="Describe additional details, environment, lighting, etc."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="openart-style">Art Style:</label>
+                        <input type="text" id="openart-style" placeholder="Describe your preferred art style">
+                    </div>
+                    
+                    <button id="generate-openart-prompt" class="primary-button">Generate Prompt</button>
+                </div>
+                
+                <div class="panel" id="openart-result" style="display: none;">
+                    <h3>Generated Prompt</h3>
+                    <div id="openart-generated-prompt" class="result-box"></div>
+                    
+                    <h4>Recommended Settings</h4>
+                    <ul id="openart-recommendations"></ul>
+                    
+                    <button id="copy-openart-prompt" class="secondary-button">Copy Prompt</button>
+                </div>
+            </div>
+            
+            <!-- Kling AI Motion Tab -->
+            <div id="kling-motion" class="tab-content">
+                <h2>Kling AI Motion Prompt Generator</h2>
+                <p>Create motion-optimized prompts for Kling AI video generation</p>
+                
+                <div class="panel">
+                    <h3>Motion Prompt Information</h3>
+                    <p>Enter your base prompt and select motion options:</p>
+                    
+                    <div class="form-group">
+                        <label for="base-prompt">Base Image Prompt:</label>
+                        <textarea id="base-prompt" placeholder="Enter the base prompt for your image"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="motion-type">Motion Type:</label>
+                        <select id="motion-type">
+                            <option value="simple">Simple Motion</option>
+                            <option value="camera">Camera Movement</option>
+                            <option value="environmental">Environmental Motion</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="motion-intensity">Motion Intensity:</label>
+                        <select id="motion-intensity">
+                            <option value="low">Low (Subtle)</option>
+                            <option value="medium">Medium (Balanced)</option>
+                            <option value="high">High (Dramatic)</option>
+                        </select>
+                    </div>
+                    
+                    <button id="generate-motion-prompt" class="primary-button">Generate Motion Prompt</button>
+                </div>
+                
+                <div class="panel" id="motion-result" style="display: none;">
+                    <h3>Generated Motion Prompt</h3>
+                    <div id="motion-generated-prompt" class="result-box"></div>
+                    
+                    <h4>Motion Tips</h4>
+                    <ul>
+                        <li>For better results, focus on describing the motion rather than static visual elements</li>
+                        <li>Consider using clear directional terms (left to right, upward, etc.)</li>
+                        <li>Experiment with different intensity levels to find the right amount of movement</li>
+                    </ul>
+                    
+                    <button id="copy-motion-prompt" class="secondary-button">Copy Prompt</button>
                 </div>
             </div>
             
@@ -123,6 +221,7 @@
         </div>
     </div>
 
+    <script src="js/openart-kling.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Tab navigation
