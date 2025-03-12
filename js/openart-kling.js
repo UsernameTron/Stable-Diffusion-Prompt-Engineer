@@ -4,6 +4,14 @@
  */
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Negative prompt templates for OpenArt models
+    const negativePrompts = {
+        juggernautxl: "deformed iris, deformed pupils, semi-realistic, cgi, 3d, render, sketch, cartoon, drawing, anime, mutated hands and fingers, deformed, distorted, disfigured, poorly drawn, bad anatomy, wrong anatomy, extra limb, missing limb, floating limbs, disconnected limbs, mutation, mutated, ugly, disgusting, amputation",
+        fluxdev: "blurry, distorted text, illegible text, poorly drawn, warped, unrealistic proportions, stretched image, deformed, disfigured, bad typography, spelling errors, text cutoff, bad font, pixelated text, watermark, signature",
+        juggernautfluxpro: "plastic skin, smooth skin, airbrushed skin, blurry, watermark, text, ugly, deformed, disfigured, bad anatomy, poorly drawn face, mutation, mutated, extra limb, missing limb, floating limbs, disconnected limbs, out of frame, extra fingers, mutated hands",
+        fluxpro: "poor quality, low resolution, bad composition, distorted, disfigured, poorly rendered, bad craftsmanship, poor lighting, flat lighting, pixelated, watermark, text, artificial, oversaturated, cheap-looking",
+        sdxlfilm: "digital, perfect skin, sharp, crisp, perfect, flawless, smooth, plastic skin, airbrushed, pristine, hdr, hdr lighting, hdr render, perfect lighting, artificial lighting, studio lighting"
+    };
     // OpenArt AI model enhancers
     const modelEnhancers = {
         juggernautxl: {
@@ -69,6 +77,9 @@ document.addEventListener('DOMContentLoaded', () => {
         high: ["quickly", "rapidly", "dramatically", "vigorously"]
     };
     
+    // Kling AI specific negative prompts
+    const klingNegativePrompt = "static, still image, no movement, frozen, stationary, motionless, fixed, immobile, still frame, bad quality, blurry, distorted, deformed, ugly, duplicate frames, jittery, error, defect, glitch, pixelated, low resolution, poor quality";
+    
     /**
      * Generate a prompt optimized for OpenArt AI models
      */
@@ -115,9 +126,13 @@ document.addEventListener('DOMContentLoaded', () => {
         // Format the final prompt
         const finalPrompt = promptParts.join(", ");
         
-        // Return prompt and recommendations
+        // Get model-specific negative prompt
+        const negativePrompt = negativePrompts[model] || negativePrompts.juggernautxl;
+        
+        // Return prompt, negative prompt, and recommendations
         return {
             prompt: finalPrompt,
+            negativePrompt: negativePrompt,
             recommendations: {
                 cfg: modelEnhancers[model].recommendedCFG,
                 sampler: modelEnhancers[model].recommendedSampler,
@@ -167,6 +182,9 @@ document.addEventListener('DOMContentLoaded', () => {
         // Display the prompt
         document.getElementById('openart-generated-prompt').textContent = result.prompt;
         
+        // Display the negative prompt
+        document.getElementById('openart-negative-prompt').textContent = result.negativePrompt;
+        
         // Display recommendations
         const recList = document.getElementById('openart-recommendations');
         recList.innerHTML = `
@@ -197,6 +215,24 @@ document.addEventListener('DOMContentLoaded', () => {
             });
     });
     
+    // Event listener for copy OpenArt negative prompt
+    document.getElementById('copy-openart-negative')?.addEventListener('click', () => {
+        const negativePrompt = document.getElementById('openart-negative-prompt').textContent;
+        navigator.clipboard.writeText(negativePrompt)
+            .then(() => {
+                const button = document.getElementById('copy-openart-negative');
+                const originalText = button.textContent;
+                button.textContent = 'Copied!';
+                setTimeout(() => {
+                    button.textContent = originalText;
+                }, 2000);
+            })
+            .catch(err => {
+                console.error('Failed to copy text: ', err);
+                alert('Failed to copy to clipboard');
+            });
+    });
+    
     // Event listener for Kling motion prompt generation
     document.getElementById('generate-motion-prompt')?.addEventListener('click', () => {
         const basePrompt = document.getElementById('base-prompt').value;
@@ -215,6 +251,9 @@ document.addEventListener('DOMContentLoaded', () => {
         // Display the prompt
         document.getElementById('motion-generated-prompt').textContent = motionPrompt;
         
+        // Display the negative prompt
+        document.getElementById('motion-negative-prompt').textContent = klingNegativePrompt;
+        
         // Show the result
         document.getElementById('motion-result').style.display = 'block';
     });
@@ -225,6 +264,24 @@ document.addEventListener('DOMContentLoaded', () => {
         navigator.clipboard.writeText(prompt)
             .then(() => {
                 const button = document.getElementById('copy-motion-prompt');
+                const originalText = button.textContent;
+                button.textContent = 'Copied!';
+                setTimeout(() => {
+                    button.textContent = originalText;
+                }, 2000);
+            })
+            .catch(err => {
+                console.error('Failed to copy text: ', err);
+                alert('Failed to copy to clipboard');
+            });
+    });
+    
+    // Event listener for copy motion negative prompt
+    document.getElementById('copy-motion-negative')?.addEventListener('click', () => {
+        const negativePrompt = document.getElementById('motion-negative-prompt').textContent;
+        navigator.clipboard.writeText(negativePrompt)
+            .then(() => {
+                const button = document.getElementById('copy-motion-negative');
                 const originalText = button.textContent;
                 button.textContent = 'Copied!';
                 setTimeout(() => {

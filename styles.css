@@ -230,3 +230,9 @@ strong {
     overflow-y: auto;
     line-height: 1.5;
 }
+
+.negative-box {
+    background-color: #fff0f0;
+    border: 1px solid #ffcccc;
+    border-left: 4px solid #e74c3c;
+}

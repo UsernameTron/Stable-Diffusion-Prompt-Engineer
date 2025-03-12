@@ -93,11 +93,14 @@
                 <div class="panel" id="openart-result" style="display: none;">
                     <h3>Generated Prompt</h3>
                     <div id="openart-generated-prompt" class="result-box"></div>
+                    <button id="copy-openart-prompt" class="secondary-button">Copy Prompt</button>
+                    
+                    <h3>Negative Prompt</h3>
+                    <div id="openart-negative-prompt" class="result-box negative-box"></div>
+                    <button id="copy-openart-negative" class="secondary-button">Copy Negative Prompt</button>
                     
                     <h4>Recommended Settings</h4>
                     <ul id="openart-recommendations"></ul>
-                    
-                    <button id="copy-openart-prompt" class="secondary-button">Copy Prompt</button>
                 </div>
             </div>
             
@@ -139,15 +142,19 @@
                 <div class="panel" id="motion-result" style="display: none;">
                     <h3>Generated Motion Prompt</h3>
                     <div id="motion-generated-prompt" class="result-box"></div>
+                    <button id="copy-motion-prompt" class="secondary-button">Copy Prompt</button>
+                    
+                    <h3>Negative Prompt</h3>
+                    <div id="motion-negative-prompt" class="result-box negative-box"></div>
+                    <button id="copy-motion-negative" class="secondary-button">Copy Negative Prompt</button>
                     
                     <h4>Motion Tips</h4>
                     <ul>
                         <li>For better results, focus on describing the motion rather than static visual elements</li>
                         <li>Consider using clear directional terms (left to right, upward, etc.)</li>
                         <li>Experiment with different intensity levels to find the right amount of movement</li>
+                        <li>The negative prompt helps prevent static images and common motion artifacts</li>
                     </ul>
-                    
-                    <button id="copy-motion-prompt" class="secondary-button">Copy Prompt</button>
                 </div>
             </div>
             
