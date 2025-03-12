@@ -4,648 +4,269 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stable Diffusion Prompt Assistant</title>
-    <link rel="stylesheet" href="css/style.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <meta name="description" content="Comprehensive tool for optimizing Stable Diffusion prompts across different models and use cases">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background-color: #f8f9fa;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        .card {
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border: none;
+        }
+        .card-header {
+            background-color: #6c5ce7;
+            color: white;
+            font-weight: 600;
+        }
+        .badge {
+            font-size: 0.9em;
+        }
+        .preview-box {
+            min-height: 100px;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            margin-bottom: 15px;
+            font-family: monospace;
+        }
+        .btn-primary {
+            background-color: #6c5ce7;
+            border-color: #6c5ce7;
+        }
+        .btn-primary:hover {
+            background-color: #5b4ac9;
+            border-color: #5b4ac9;
+        }
+        .parameter-group {
+            margin-bottom: 20px;
+        }
+        .parameter-label {
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .param-option {
+            display: inline-block;
+            padding: 6px 10px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: white;
+        }
+        .param-option.active {
+            background-color: #6c5ce7;
+            color: white;
+            border-color: #6c5ce7;
+        }
+        .tab-content {
+            padding: 20px;
+            background-color: white;
+            border-radius: 0 0 5px 5px;
+        }
+    </style>
 </head>
 <body>
-    <div class="container-fluid container-lg">
-        <header>
-            <h1>Stable Diffusion Prompt Engineering Assistant</h1>
-            <p>Create optimized prompts for different SD models and use cases</p>
-        </header>
+    <div class="container">
+        <h1 class="text-center mb-4">Stable Diffusion Prompt Assistant</h1>
         
-        <div class="tabs">
-            <button class="tab active" data-tab="prompt-generator">Prompt Generator</button>
-            <button class="tab" data-tab="negative-prompts">Negative Prompts</button>
-            <button class="tab" data-tab="parameter-optimization">Parameters</button>
-            <button class="tab" data-tab="controlnet-guide">ControlNet</button>
-            <button class="tab" data-tab="result-analysis">Result Analysis</button>
-            <button class="tab" data-tab="modifier-library">Modifier Library</button>
-            <button class="tab" data-tab="examples">Example Prompts</button>
-            <button class="tab" data-tab="ab-testing">A/B Testing</button>
-        </div>
-        
-        <!-- Prompt Generator Tab -->
-        <div id="prompt-generator" class="tab-content active">
-            <div class="card mb-3">
-                <div class="card-header">
-                    <h2 class="mb-0">Base Concept</h2>
-                </div>
-                <div class="card-body">
-                    <div class="form-group mb-3">
-                        <label for="baseConceptField" class="form-label">Enter your base concept</label>
-                        <input type="text" id="baseConceptField" placeholder="Enter your base concept here" class="form-control">
-                        <small class="text-muted">Start with a clear description of what you want to generate</small>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card mb-3">
-                <div class="card-header">
-                    <h2 class="mb-0">Model-Specific Prompt Generation</h2>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-12 col-md-6 mb-3">
-                            <div class="form-group">
-                                <label for="model-select" class="form-label">Select Model</label>
-                                <select id="model-select" class="form-select">
-                                    <option value="sdxl">Stable Diffusion XL</option>
-                                    <option value="sd15">Stable Diffusion 1.5</option>
-                                    <option value="sd21">Stable Diffusion 2.1</option>
-                                </select>
-                            </div>
-                        </div>
-                        
-                        <div class="col-12 col-md-6 mb-3">
-                            <div class="form-group">
-                                <label for="content-type" class="form-label">Content Type</label>
-                                <select id="content-type" class="form-select">
-                                    <option value="portrait">Portrait/Character</option>
-                                    <option value="landscape">Landscape/Environment</option>
-                                    <option value="concept">Concept Art</option>
-                                    <option value="anime">Anime/Stylized</option>
-                                    <option value="urban">Urban Scene</option>
-                                    <option value="fantasy">Fantasy</option>
-                                    <option value="surreal">Surreal</option>
-                                    <option value="stillLife">Still Life</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div id="modifier-categories" class="mb-3">
-                        <label class="form-label">Modifiers</label>
-                        <div class="row" id="modifier-toggles">
-                            <!-- Dynamically populated based on content type -->
-                        </div>
-                    </div>
-                    
-                    <div id="custom-options" class="mb-3">
-                        <label class="form-label">Custom Parameters</label>
-                        <div class="row">
-                            <!-- Dynamically populated based on content type -->
-                        </div>
-                    </div>
-                    
-                    <div class="d-grid mb-3">
-                        <button id="generate-prompt-btn" class="btn btn-primary">Generate Prompt</button>
-                    </div>
-                    
-                    <div class="card mt-3">
-                        <div class="card-header d-flex justify-content-between align-items-center">
-                            <span>Live Prompt Preview</span>
-                            <div>
-                                <span id="tokenCount" class="badge bg-secondary me-2">0</span>
-                                <span class="text-muted small">tokens used</span>
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <pre id="promptPreview" class="border p-3 bg-light">Your prompt will appear here...</pre>
-                            <div id="token-optimization" class="small text-muted mt-2"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div id="prompt-result" class="card" style="display: none;">
-                <div class="card-header">
-                    <h2 class="mb-0">Final Prompt</h2>
-                </div>
-                <div class="card-body">
-                    <div class="position-relative">
-                        <button class="btn btn-sm btn-dark position-absolute end-0 top-0 m-2" id="copy-prompt-btn">Copy</button>
-                        <div id="prompt-text" class="border p-3 bg-light" style="min-height: 100px;"></div>
-                    </div>
-                    
-                    <div class="mt-3">
-                        <h5>Export Options</h5>
-                        <div class="d-flex gap-2" id="exportOptions">
-                            <select id="exportFormat" class="form-select">
-                                <option value="plaintext">Plain Text</option>
-                                <option value="automatic1111">Automatic1111</option>
-                                <option value="comfyui">ComfyUI</option>
-                                <option value="invokeai">InvokeAI</option>
-                            </select>
-                            <button id="export-btn" class="btn btn-secondary">Export</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div id="parameter-guidance" class="card mt-3" style="display: none;">
-                <div class="card-header">
-                    <h2 class="mb-0">Recommended Parameters</h2>
-                </div>
-                <div class="card-body">
-                    <div id="parameter-recommendations"></div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Negative Prompts Tab -->
-        <div id="negative-prompts" class="tab-content">
-            <div class="card mb-3">
-                <div class="card-header">
-                    <h2 class="mb-0">Model-Specific Negative Prompts</h2>
-                </div>
-                <div class="card-body">
-                    <div class="row mb-3">
-                        <div class="col-12 col-md-6 mb-3">
-                            <label for="neg-model-select" class="form-label">Select Model</label>
-                            <select id="neg-model-select" class="form-select">
-                                <option value="sdxl">Stable Diffusion XL</option>
-                                <option value="sd15">Stable Diffusion 1.5</option>
-                                <option value="sd21">Stable Diffusion 2.1</option>
-                            </select>
-                        </div>
-                        
-                        <div class="col-12 col-md-6 mb-3">
-                            <label for="neg-content-type" class="form-label">Content Type</label>
-                            <select id="neg-content-type" class="form-select">
-                                <option value="portrait">Portrait/Character</option>
-                                <option value="landscape">Landscape/Environment</option>
-                                <option value="concept">Concept Art</option>
-                                <option value="anime">Anime/Stylized</option>
-                                <option value="urban">Urban Scene</option>
-                                <option value="fantasy">Fantasy</option>
-                                <option value="surreal">Surreal</option>
-                                <option value="stillLife">Still Life</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="card mb-3">
-                        <div class="card-header">
-                            <h5 class="mb-0">Negative Categories</h5>
-                        </div>
-                        <div class="card-body">
-                            <div id="negativeCategories">
-                                <!-- Will be populated with negative prompt categories -->
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="d-grid mb-3">
-                        <button id="generate-negative-btn" class="btn btn-primary">Generate Negative Prompt</button>
-                    </div>
-                    
-                    <div id="negative-result" class="result border p-3 bg-light position-relative" style="display: none;">
-                        <button class="btn btn-sm btn-dark position-absolute end-0 top-0 m-2" id="copy-negative-btn">Copy</button>
-                        <div id="negative-text" class="mt-4"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Parameter Optimization Tab -->
-        <div id="parameter-optimization" class="tab-content">
-            <div class="card mb-3">
-                <div class="card-header">
-                    <h2 class="mb-0">Parameter Optimization</h2>
-                </div>
-                <div class="card-body">
-                    <div class="row mb-4">
-                        <div class="col-12 col-md-6 mb-3">
-                            <label for="param-content-type" class="form-label">Content Type</label>
-                            <select id="param-content-type" class="form-select">
-                                <option value="portrait">Portrait/Character</option>
-                                <option value="landscape">Landscape/Environment</option>
-                                <option value="concept">Concept Art</option>
-                                <option value="anime">Anime/Stylized</option>
-                                <option value="urban">Urban Scene</option>
-                                <option value="fantasy">Fantasy</option>
-                                <option value="surreal">Surreal</option>
-                                <option value="stillLife">Still Life</option>
-                            </select>
-                        </div>
-                        
-                        <div class="col-12 col-md-6 mb-3">
-                            <label for="param-model-select" class="form-label">Select Model</label>
-                            <select id="param-model-select" class="form-select">
-                                <option value="sdxl">Stable Diffusion XL</option>
-                                <option value="sd15">Stable Diffusion 1.5</option>
-                                <option value="sd21">Stable Diffusion 2.1</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <div class="d-grid mb-4">
-                        <button id="get-parameters-btn" class="btn btn-primary">Get Parameter Recommendations</button>
-                    </div>
-                    
-                    <div id="params-result" style="display: none;">
-                        <div class="row mb-4">
-                            <div class="col-md-6 col-lg-3 mb-3">
-                                <div class="card h-100">
-                                    <div class="card-header d-flex align-items-center">
-                                        <h5 class="mb-0">CFG Scale</h5>
-                                        <i class="ms-2 text-primary" data-bs-toggle="tooltip" data-bs-placement="top" data-param="cfg" title="CFG Scale controls how closely the image follows the prompt. Higher values stick closer to the prompt but may be less creative.">ⓘ</i>
-                                    </div>
-                                    <div class="card-body">
-                                        <div id="cfg-guidance"></div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="col-md-6 col-lg-3 mb-3">
-                                <div class="card h-100">
-                                    <div class="card-header d-flex align-items-center">
-                                        <h5 class="mb-0">Samplers</h5>
-                                        <i class="ms-2 text-primary" data-bs-toggle="tooltip" data-bs-placement="top" data-param="sampler" title="Different samplers produce different styles of images. Experiment to find your preference.">ⓘ</i>
-                                    </div>
-                                    <div class="card-body">
-                                        <div id="sampler-guidance"></div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="col-md-6 col-lg-3 mb-3">
-                                <div class="card h-100">
-                                    <div class="card-header d-flex align-items-center">
-                                        <h5 class="mb-0">Steps</h5>
-                                        <i class="ms-2 text-primary" data-bs-toggle="tooltip" data-bs-placement="top" data-param="steps" title="More steps generally produce higher quality images but take longer to generate.">ⓘ</i>
-                                    </div>
-                                    <div class="card-body">
-                                        <div id="steps-guidance"></div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="col-md-6 col-lg-3 mb-3">
-                                <div class="card h-100">
-                                    <div class="card-header d-flex align-items-center">
-                                        <h5 class="mb-0">Strength (img2img)</h5>
-                                        <i class="ms-2 text-primary" data-bs-toggle="tooltip" data-bs-placement="top" data-param="strength" title="Controls how much to transform the input image. Lower values preserve more of the original.">ⓘ</i>
-                                    </div>
-                                    <div class="card-body">
-                                        <div id="strength-guidance"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="card mb-4">
-                            <div class="card-header">
-                                <h5 class="mb-0">Seed Management</h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="row g-3">
-                                    <div class="col-md-6">
-                                        <label for="seed-input" class="form-label">Seed Value</label>
-                                        <div class="input-group">
-                                            <input type="number" id="seed-input" class="form-control" placeholder="Enter seed (or leave blank for random)">
-                                            <button class="btn btn-outline-secondary" type="button" id="random-seed-btn">Random</button>
-                                        </div>
-                                        <small class="text-muted">Use the same seed to maintain consistency across generations</small>
-                                    </div>
-                                    
-                                    <div class="col-md-6" id="seedManager">
-                                        <label class="form-label">Saved Seeds</label>
-                                        <div class="input-group">
-                                            <select id="savedSeedsSelect" class="form-select">
-                                                <option value="">Select a saved seed</option>
-                                            </select>
-                                            <button class="btn btn-outline-secondary" type="button" id="use-seed-btn">Use</button>
-                                        </div>
-                                        
-                                        <div class="input-group mt-2">
-                                            <input type="text" id="seedName" class="form-control" placeholder="Name">
-                                            <button class="btn btn-outline-primary" type="button" id="save-seed-btn">Save Current</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- ControlNet Guide Tab -->
-        <div id="controlnet-guide" class="tab-content">
-            <div class="card mb-3">
-                <div class="card-header">
-                    <h2 class="mb-0">ControlNet Integration Guide</h2>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-8 mb-3">
-                            <label for="controlnet-select" class="form-label">Select Technique</label>
-                            <select id="controlnet-select" class="form-select">
-                                <option value="openPose">Open Pose</option>
-                                <option value="cannyEdge">Canny Edge (Kenny Mode)</option>
-                                <option value="depth">Depth</option>
-                                <option value="lineArt">Line Art</option>
-                                <option value="ipAdapter">IP Adapter</option>
-                            </select>
-                        </div>
-                        <div class="col-md-4 mb-3 d-flex align-items-end">
-                            <div class="d-grid w-100">
-                                <button id="get-controlnet-btn" class="btn btn-primary">Get Implementation Guide</button>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="row mt-3">
-                        <div class="col-md-5 order-md-2 mb-3">
-                            <div class="card h-100">
-                                <div class="card-header">
-                                    <h5 class="mb-0">Example</h5>
-                                </div>
-                                <div class="card-body text-center">
-                                    <img id="controlnet-example-img" src="https://placehold.co/400x300/e1e1e1/9b9b9b?text=Select+a+technique" class="img-fluid mb-2 border" alt="ControlNet example">
-                                    <small class="text-muted d-block" id="controlnet-example-caption">Example will appear when you select a technique</small>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="col-md-7 order-md-1">
-                            <div id="controlnet-result" class="controlnet-info card h-100" style="display: none;">
-                                <div class="card-header" id="controlnet-technique-header">
-                                    <h5 class="mb-0">Technique Information</h5>
-                                </div>
-                                <div class="card-body" id="controlnet-technique-body">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="card mt-4">
-                        <div class="card-header">
-                            <h5 class="mb-0">Prompt Adaptation for ControlNet</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <label class="form-label">Original Prompt</label>
-                                    <textarea id="original-prompt" class="form-control" rows="3" placeholder="Paste your prompt here..."></textarea>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">Adapted for ControlNet</label>
-                                    <textarea id="adapted-prompt" class="form-control" rows="3" readonly placeholder="Adapted prompt will appear here..."></textarea>
-                                </div>
-                            </div>
-                            <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-3">
-                                <button id="adapt-prompt-btn" class="btn btn-primary">Adapt Prompt</button>
-                                <button id="copy-adapted-btn" class="btn btn-outline-secondary">Copy Adapted</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Result Analysis Tab -->
-        <div id="result-analysis" class="tab-content">
-            <div class="card">
-                <h2>Result Analysis Tools</h2>
-                <div class="form-group">
-                    <label for="issue-type">Issue Category</label>
-                    <select id="issue-type">
-                        <option value="quality">Quality Issues</option>
-                        <option value="portrait">Portrait/Character Issues</option>
-                        <option value="landscape">Landscape/Environment Issues</option>
-                        <option value="common">Common Problems</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label for="specific-problem">Specific Issue (Optional)</label>
-                    <select id="specific-problem">
-                        <option value="">General advice</option>
-                        <!-- Options will be populated based on issue type -->
-                    </select>
-                </div>
-                
-                <button id="analyze-btn">Get Analysis & Solutions</button>
-                
-                <div id="analysis-result" style="display: none;" class="result"></div>
-            </div>
-        </div>
-        
-        <!-- Modifier Library Tab -->
-        <div id="modifier-library" class="tab-content">
-            <div class="card">
-                <h2>Comprehensive Modifier Library</h2>
-                <div class="form-group">
-                    <label for="modifier-category">Category</label>
-                    <select id="modifier-category">
-                        <option value="photography">Photography</option>
-                        <option value="artMediums">Art Mediums</option>
-                        <option value="artists">Artists</option>
-                        <option value="enhancers">Quality Enhancers</option>
-                    </select>
-                </div>
-                
-                <div class="form-group" id="subcategory-container" style="display: none;">
-                    <label for="modifier-subcategory">Sub-Category</label>
-                    <select id="modifier-subcategory">
-                        <!-- Options will be populated based on category -->
-                    </select>
-                </div>
-                
-                <button id="get-modifiers-btn">Get Modifiers</button>
-                
-                <div id="modifiers-result" style="display: none;" class="grid"></div>
-            </div>
-        </div>
-        
-        <!-- Example Prompts Tab -->
-        <div id="examples" class="tab-content">
-            <div class="card">
-                <h2>Example Prompts</h2>
-                <p>Optimized prompt examples based on model and use case</p>
-                
-                <div class="examples-container">
-                    <div class="example-item">
-                        <h3>SDXL Portrait</h3>
-                        <div class="example-prompt">A medieval knight, standing on a battlefield at sunset, cinematic lighting, high fidelity, ultra-detailed</div>
-                        <button class="copy-example-btn" data-text="A medieval knight, standing on a battlefield at sunset, cinematic lighting, high fidelity, ultra-detailed">Copy</button>
-                    </div>
-                    
-                    <div class="example-item">
-                        <h3>SD 1.5 Urban</h3>
-                        <div class="example-prompt">A futuristic cityscape, neon lights, flying cars, trending on artstation, highly detailed</div>
-                        <button class="copy-example-btn" data-text="A futuristic cityscape, neon lights, flying cars, trending on artstation, highly detailed">Copy</button>
-                    </div>
-                    
-                    <div class="example-item">
-                        <h3>SD 1.5 Portrait</h3>
-                        <div class="example-prompt">A close-up portrait of a young woman with freckles, highly detailed, professional photograph, sharp focus</div>
-                        <button class="copy-example-btn" data-text="A close-up portrait of a young woman with freckles, highly detailed, professional photograph, sharp focus">Copy</button>
-                    </div>
-                    
-                    <div class="example-item">
-                        <h3>SD 2.1 Concept</h3>
-                        <div class="example-prompt">An abstract concept art piece, swirling colors, vibrant, cinematic style, ultra-detailed</div>
-                        <button class="copy-example-btn" data-text="An abstract concept art piece, swirling colors, vibrant, cinematic style, ultra-detailed">Copy</button>
-                    </div>
-                    
-                    <div class="example-item">
-                        <h3>SDXL Urban</h3>
-                        <div class="example-prompt">A cyberpunk alley, rain, neon signs, cinematic lighting, high fidelity, ultra-detailed</div>
-                        <button class="copy-example-btn" data-text="A cyberpunk alley, rain, neon signs, cinematic lighting, high fidelity, ultra-detailed">Copy</button>
-                    </div>
-                    
-                    <div class="example-item">
-                        <h3>SD 2.1 Landscape</h3>
-                        <div class="example-prompt">A serene landscape, mountains, a lake, natural lighting, ultra-detailed, wide shot</div>
-                        <button class="copy-example-btn" data-text="A serene landscape, mountains, a lake, natural lighting, ultra-detailed, wide shot">Copy</button>
-                    </div>
-                    
-                    <div class="example-item">
-                        <h3>SD 1.5 Anime</h3>
-                        <div class="example-prompt">An anime character, exaggerated features, futuristic setting, highly detailed, trending on artstation</div>
-                        <button class="copy-example-btn" data-text="An anime character, exaggerated features, futuristic setting, highly detailed, trending on artstation">Copy</button>
-                    </div>
-                    
-                    <div class="example-item">
-                        <h3>SDXL Surreal</h3>
-                        <div class="example-prompt">A surreal scene, melting clocks in a desert, cinematic lighting, high fidelity, ultra-detailed</div>
-                        <button class="copy-example-btn" data-text="A surreal scene, melting clocks in a desert, cinematic lighting, high fidelity, ultra-detailed">Copy</button>
-                    </div>
-                    
-                    <div class="example-item">
-                        <h3>SD 2.1 Concept</h3>
-                        <div class="example-prompt">A detailed sketch of a robot, intricate gears, technical drawing, ultra-detailed, sharp focus</div>
-                        <button class="copy-example-btn" data-text="A detailed sketch of a robot, intricate gears, technical drawing, ultra-detailed, sharp focus">Copy</button>
-                    </div>
-                    
-                    <div class="example-item">
-                        <h3>SDXL Still Life</h3>
-                        <div class="example-prompt">A vibrant still life, fruits on a table, rich colors, ultra high definition, professional photograph, highly detailed</div>
-                        <button class="copy-example-btn" data-text="A vibrant still life, fruits on a table, rich colors, ultra high definition, professional photograph, highly detailed">Copy</button>
-                    </div>
-                    
-                    <div class="example-item">
-                        <h3>SD 2.1 Landscape</h3>
-                        <div class="example-prompt">A dreamy forest scene, mist, soft natural lighting, ultra-detailed, atmospheric</div>
-                        <button class="copy-example-btn" data-text="A dreamy forest scene, mist, soft natural lighting, ultra-detailed, atmospheric">Copy</button>
-                    </div>
-                    
-                    <div class="example-item">
-                        <h3>SD 1.5 Portrait</h3>
-                        <div class="example-prompt">A futuristic portrait of a cyborg, metallic skin, digital art, highly detailed, trending on artstation</div>
-                        <button class="copy-example-btn" data-text="A futuristic portrait of a cyborg, metallic skin, digital art, highly detailed, trending on artstation">Copy</button>
-                    </div>
-                    
-                    <div class="example-item">
-                        <h3>SDXL Landscape</h3>
-                        <div class="example-prompt">An impressionistic painting, sunrise over a quiet lake, soft brush strokes, cinematic lighting, ultra-detailed</div>
-                        <button class="copy-example-btn" data-text="An impressionistic painting, sunrise over a quiet lake, soft brush strokes, cinematic lighting, ultra-detailed">Copy</button>
-                    </div>
-                    
-                    <div class="example-item">
-                        <h3>SD 2.1 Concept</h3>
-                        <div class="example-prompt">A hyper-realistic rendering of a futuristic sports car, dynamic motion, racetrack setting, ultra-detailed, cinematic quality</div>
-                        <button class="copy-example-btn" data-text="A hyper-realistic rendering of a futuristic sports car, dynamic motion, racetrack setting, ultra-detailed, cinematic quality">Copy</button>
-                    </div>
-                    
-                    <div class="example-item">
-                        <h3>SDXL Fantasy</h3>
-                        <div class="example-prompt">A whimsical illustration of a fairy tale castle, surrounded by lush greenery, vibrant colors, ultra-detailed, cinematic lighting</div>
-                        <button class="copy-example-btn" data-text="A whimsical illustration of a fairy tale castle, surrounded by lush greenery, vibrant colors, ultra-detailed, cinematic lighting">Copy</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <footer>
-        <div class="container">
-            <p>Stable Diffusion Prompt Assistant - For optimal results with SD models</p>
-        </div>
-    </footer>
-    
-    <!-- Add A/B Testing Tab -->
-    <div id="ab-testing" class="tab-content">
         <div class="card">
-            <div class="card-header">
-                <h2 class="mb-0">A/B Testing and Experimentation</h2>
-            </div>
+            <div class="card-header">Input</div>
             <div class="card-body">
-                <div class="row" id="abTestingContainer">
+                <div class="mb-3">
+                    <label for="baseConceptField" class="form-label">What do you want to generate?</label>
+                    <input type="text" class="form-control form-control-lg" id="baseConceptField" 
+                           placeholder="Enter your base concept here (e.g., 'a portrait of a cyberpunk warrior')">
+                </div>
+                
+                <div class="row mb-3">
                     <div class="col-md-6">
-                        <div class="card mb-3">
-                            <div class="card-header d-flex justify-content-between align-items-center">
-                                <h5 class="mb-0">Variation A</h5>
-                                <button class="btn btn-sm btn-outline-primary" id="edit-var-a">Edit</button>
+                        <label for="modelSelect" class="form-label">Model</label>
+                        <select class="form-select" id="modelSelect">
+                            <option value="sdxl">Stable Diffusion XL</option>
+                            <option value="sd15">Stable Diffusion 1.5</option>
+                            <option value="sd21">Stable Diffusion 2.1</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="contentType" class="form-label">Content Type</label>
+                        <select class="form-select" id="contentType">
+                            <option value="portrait">Portrait/Character</option>
+                            <option value="landscape">Landscape/Environment</option>
+                            <option value="abstract">Abstract</option>
+                            <option value="concept">Concept Art</option>
+                            <option value="anime">Anime/Stylized</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Content Specific Modifiers -->
+                <div id="modifiersContainer" class="row mb-3">
+                    <!-- Will be dynamically populated -->
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label">Prompt Preview <span class="badge bg-secondary" id="tokenCount">0</span> tokens</label>
+                    <div class="preview-box" id="promptPreview">Your prompt will appear here...</div>
+                    <div id="tokenWarning" class="text-danger small"></div>
+                </div>
+                
+                <div class="d-grid gap-2">
+                    <button class="btn btn-primary btn-lg" id="generateBtn">Generate Optimized Prompt</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card" id="resultCard" style="display: none;">
+            <div class="card-header">Results</div>
+            <div class="card-body">
+                <!-- Tab navigation -->
+                <ul class="nav nav-tabs" id="resultTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="prompt-tab" data-bs-toggle="tab" data-bs-target="#prompt-content" type="button" role="tab">Optimized Prompt</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="negative-tab" data-bs-toggle="tab" data-bs-target="#negative-content" type="button" role="tab">Negative Prompt</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="parameters-tab" data-bs-toggle="tab" data-bs-target="#parameters-content" type="button" role="tab">Parameters</button>
+                    </li>
+                </ul>
+                
+                <!-- Tab content -->
+                <div class="tab-content" id="resultTabsContent">
+                    <!-- Optimized Prompt Tab -->
+                    <div class="tab-pane fade show active" id="prompt-content" role="tabpanel">
+                        <div class="mb-3">
+                            <label class="form-label">Optimized Prompt</label>
+                            <div class="position-relative">
+                                <div class="preview-box" id="finalPrompt"></div>
+                                <button class="btn btn-sm btn-primary position-absolute top-0 end-0 m-2" id="copyPromptBtn">Copy</button>
                             </div>
-                            <div class="card-body">
-                                <textarea class="form-control mb-2" id="prompt-var-0" rows="3" placeholder="Enter your prompt..."></textarea>
-                                <div class="input-group mb-3">
-                                    <input type="number" class="form-control" id="seed-var-0" placeholder="Seed (optional)">
-                                    <button class="btn btn-outline-secondary" id="random-var-0">Random</button>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Export Format</label>
+                            <div class="input-group">
+                                <select class="form-select" id="exportFormat">
+                                    <option value="plaintext">Plain Text</option>
+                                    <option value="automatic1111">Automatic1111</option>
+                                    <option value="comfyui">ComfyUI</option>
+                                    <option value="invokeai">InvokeAI</option>
+                                </select>
+                                <button class="btn btn-outline-secondary" type="button" id="exportBtn">Export</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Negative Prompt Tab -->
+                    <div class="tab-pane fade" id="negative-content" role="tabpanel">
+                        <div class="mb-3">
+                            <label class="form-label">Negative Prompt</label>
+                            <div class="position-relative">
+                                <div class="preview-box" id="negativePrompt"></div>
+                                <button class="btn btn-sm btn-primary position-absolute top-0 end-0 m-2" id="copyNegativeBtn">Copy</button>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Negative Categories</label>
+                            <div id="negativeCategories" class="row">
+                                <div class="col-md-6">
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input negative-category" type="checkbox" id="negQuality" checked>
+                                        <label class="form-check-label" for="negQuality">Quality Issues</label>
+                                    </div>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input negative-category" type="checkbox" id="negAnatomy" checked>
+                                        <label class="form-check-label" for="negAnatomy">Anatomical Issues</label>
+                                    </div>
                                 </div>
-                                <div class="d-grid">
-                                    <button class="btn btn-primary" id="generate-var-0">Generate</button>
-                                </div>
-                                <div class="mt-3 text-center">
-                                    <img id="result-var-0" class="img-fluid mt-2 border d-none" alt="Variation A result">
+                                <div class="col-md-6">
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input negative-category" type="checkbox" id="negText" checked>
+                                        <label class="form-check-label" for="negText">Text & Watermarks</label>
+                                    </div>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input negative-category" type="checkbox" id="negComposition">
+                                        <label class="form-check-label" for="negComposition">Composition Issues</label>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                     
-                    <div class="col-md-6">
-                        <div class="card mb-3">
-                            <div class="card-header d-flex justify-content-between align-items-center">
-                                <h5 class="mb-0">Variation B</h5>
-                                <button class="btn btn-sm btn-outline-primary" id="edit-var-b">Edit</button>
+                    <!-- Parameters Tab -->
+                    <div class="tab-pane fade" id="parameters-content" role="tabpanel">
+                        <div class="parameter-group">
+                            <label class="parameter-label">CFG Scale</label>
+                            <div id="cfgOptions">
+                                <div class="param-option" data-value="5">Low (5)</div>
+                                <div class="param-option active" data-value="7.5">Medium (7.5)</div>
+                                <div class="param-option" data-value="12">High (12)</div>
+                                <div class="param-option" data-value="custom">Custom</div>
                             </div>
-                            <div class="card-body">
-                                <textarea class="form-control mb-2" id="prompt-var-1" rows="3" placeholder="Enter your prompt..."></textarea>
-                                <div class="input-group mb-3">
-                                    <input type="number" class="form-control" id="seed-var-1" placeholder="Seed (optional)">
-                                    <button class="btn btn-outline-secondary" id="random-var-1">Random</button>
-                                </div>
-                                <div class="d-grid">
-                                    <button class="btn btn-primary" id="generate-var-1">Generate</button>
-                                </div>
-                                <div class="mt-3 text-center">
-                                    <img id="result-var-1" class="img-fluid mt-2 border d-none" alt="Variation B result">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="mb-0">Comparison Analysis</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="mb-3">
-                            <label class="form-label">What differs between variations?</label>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="diff-type" id="diff-prompt" checked>
-                                <label class="form-check-label" for="diff-prompt">Prompt changes</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="diff-type" id="diff-seed">
-                                <label class="form-check-label" for="diff-seed">Seed changes</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="diff-type" id="diff-params">
-                                <label class="form-check-label" for="diff-params">Parameter changes</label>
+                            <input type="range" class="form-range" min="1" max="15" step="0.5" value="7.5" id="cfgSlider">
+                            <div class="small text-muted">
+                                Low: More creative but less prompt adherence<br>
+                                Medium: Balanced results<br>
+                                High: Strict prompt adherence but less creative
                             </div>
                         </div>
                         
-                        <div id="diff-analysis" class="border p-3 bg-light">
-                            <p>Generate both variations to see the difference analysis</p>
+                        <div class="parameter-group">
+                            <label class="parameter-label">Steps</label>
+                            <div id="stepsOptions">
+                                <div class="param-option" data-value="20">Quick (20)</div>
+                                <div class="param-option active" data-value="30">Standard (30)</div>
+                                <div class="param-option" data-value="50">Detailed (50)</div>
+                                <div class="param-option" data-value="custom">Custom</div>
+                            </div>
+                            <input type="range" class="form-range" min="10" max="50" step="1" value="30" id="stepsSlider">
+                            <div class="small text-muted">
+                                Quick: Faster generation but less detail<br>
+                                Standard: Good balance of speed and detail<br>
+                                Detailed: Maximum quality but slower generation
+                            </div>
                         </div>
                         
-                        <div class="d-grid mt-3">
-                            <button class="btn btn-outline-primary" id="analyze-diff">Analyze Differences</button>
+                        <div class="parameter-group">
+                            <label class="parameter-label">Sampler</label>
+                            <div id="samplerOptions">
+                                <div class="param-option" data-value="ddim">DDIM</div>
+                                <div class="param-option active" data-value="euler_a">Euler a</div>
+                                <div class="param-option" data-value="dpm_2m">DPM++ 2M Karras</div>
+                                <div class="param-option" data-value="dpm_sde">DPM++ SDE Karras</div>
+                            </div>
+                            <div class="small text-muted" id="samplerDescription">
+                                Euler a: Good general-purpose sampler with balance of detail and speed
+                            </div>
+                        </div>
+                        
+                        <div class="parameter-group">
+                            <label class="parameter-label">Seed Management</label>
+                            <div class="input-group mb-3">
+                                <input type="number" class="form-control" id="seedInput" placeholder="Enter seed (optional)">
+                                <button class="btn btn-outline-secondary" type="button" id="randomSeedBtn">Random</button>
+                            </div>
+                            <div class="small text-muted">
+                                Using the same seed will produce consistent results with similar prompts
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
+    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="js/data.js"></script>
     <script src="js/app.js"></script>
