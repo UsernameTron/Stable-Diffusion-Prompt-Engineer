@@ -148,16 +148,101 @@ document.addEventListener('DOMContentLoaded', () => {
         // Clean input
         const cleanedPrompt = basePrompt.trim().replace(/\.$/, '');
         
+        // Extract subject from the basePrompt
+        let subject = "subject";
+        const possibleSubjects = cleanedPrompt.match(/^(a |an |the )?([a-z]+)/i);
+        if (possibleSubjects && possibleSubjects[2]) {
+            subject = possibleSubjects[2].toLowerCase();
+        }
+        
+        // Parse the prompt for action verbs
+        const actionVerbs = [
+            "looking", "walking", "running", "moving", "sitting", "standing", 
+            "talking", "smiling", "frowning", "gesturing", "pointing", "typing",
+            "working", "eating", "drinking", "sleeping", "dancing", "jumping",
+            "speaking", "laughing", "crying", "reading", "writing", "drawing"
+        ];
+        
+        // Find existing actions in the prompt
+        let existingActions = [];
+        actionVerbs.forEach(verb => {
+            if (cleanedPrompt.toLowerCase().includes(verb)) {
+                existingActions.push(verb);
+            }
+        });
+        
         // Select intensity modifier
         const intensityMods = intensityModifiers[intensity] || intensityModifiers.medium;
         const intensityMod = intensityMods[Math.floor(Math.random() * intensityMods.length)];
         
-        // Select motion pattern based on type
-        const motionOptions = motionPatterns[motionType] || motionPatterns.simple;
-        const selectedMotion = motionOptions[Math.floor(Math.random() * motionOptions.length)];
+        // Build motion description based on type
+        let motionDescription = "";
         
-        // Build motion prompt
-        return `${cleanedPrompt}, ${intensityMod} ${selectedMotion}`;
+        switch(motionType) {
+            case 'camera':
+                // Camera motion
+                const cameraDirections = ["from left to right", "from right to left", "forward", "backward", "in a circular motion"];
+                const cameraDirection = cameraDirections[Math.floor(Math.random() * cameraDirections.length)];
+                const cameraActions = ["panning", "tracking", "dollying", "zooming", "tilting"];
+                const cameraAction = cameraActions[Math.floor(Math.random() * cameraActions.length)];
+                
+                motionDescription = `camera ${intensityMod} ${cameraAction} ${cameraDirection}, maintaining focus on ${subject}`;
+                break;
+                
+            case 'environmental':
+                // Environmental motion
+                const envElements = ["wind", "air", "light", "shadows", "background"];
+                const envElement = envElements[Math.floor(Math.random() * envElements.length)];
+                
+                const envEffects = ["flowing", "moving", "swirling", "shifting", "changing"];
+                const envEffect = envEffects[Math.floor(Math.random() * envEffects.length)];
+                
+                motionDescription = `with ${envElement} ${intensityMod} ${envEffect} around ${subject}`;
+                break;
+                
+            case 'simple':
+            default:
+                // Enhanced simple motion based on existing actions
+                let motionVerb = "";
+                
+                if (existingActions.length > 0) {
+                    // Enhance existing action
+                    const action = existingActions[0];
+                    const enhancements = [
+                        `continuing to ${action}`,
+                        `${intensityMod} ${action}`,
+                        `${action} with increasing intensity`,
+                        `dynamically ${action}`
+                    ];
+                    motionVerb = enhancements[Math.floor(Math.random() * enhancements.length)];
+                } else {
+                    // No detected action, use generic motion
+                    const genericMotions = [
+                        "moving",
+                        "gesturing",
+                        "shifting position",
+                        "changing expression",
+                        "turning slightly"
+                    ];
+                    motionVerb = `${intensityMod} ${genericMotions[Math.floor(Math.random() * genericMotions.length)]}`;
+                }
+                
+                // Add motion context
+                const contexts = [
+                    "while maintaining eye contact",
+                    "as the scene unfolds",
+                    "with natural movement",
+                    "in a fluid motion",
+                    "with lifelike animation"
+                ];
+                const context = contexts[Math.floor(Math.random() * contexts.length)];
+                
+                motionDescription = `${motionVerb}, ${context}`;
+                break;
+        }
+        
+        // Build complete motion prompt
+        return `${cleanedPrompt}, ${motionDescription}`;
     }
     
     // Event listener for OpenArt prompt generation
