@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stable Diffusion Prompt Assistant</title>
+    <link rel="stylesheet" href="css/style.css">
+    <meta name="description" content="Comprehensive tool for optimizing Stable Diffusion prompts across different models and use cases">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Stable Diffusion Prompt Engineering Assistant</h1>
+            <p>Create optimized prompts for different SD models and use cases</p>
+        </header>
+        
+        <div class="tabs">
+            <button class="tab active" data-tab="prompt-generator">Prompt Generator</button>
+            <button class="tab" data-tab="negative-prompts">Negative Prompts</button>
+            <button class="tab" data-tab="parameter-optimization">Parameters</button>
+            <button class="tab" data-tab="controlnet-guide">ControlNet</button>
+            <button class="tab" data-tab="result-analysis">Result Analysis</button>
+            <button class="tab" data-tab="modifier-library">Modifier Library</button>
+            <button class="tab" data-tab="examples">Example Prompts</button>
+        </div>
+        
+        <!-- Prompt Generator Tab -->
+        <div id="prompt-generator" class="tab-content active">
+            <div class="card">
+                <h2>Model-Specific Prompt Generation</h2>
+                <div class="form-group">
+                    <label for="model-select">Select Model</label>
+                    <select id="model-select">
+                        <option value="sdxl">Stable Diffusion XL</option>
+                        <option value="sd15">Stable Diffusion 1.5</option>
+                        <option value="sd21">Stable Diffusion 2.1</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="content-type">Content Type</label>
+                    <select id="content-type">
+                        <option value="portrait">Portrait/Character</option>
+                        <option value="landscape">Landscape/Environment</option>
+                        <option value="concept">Concept Art</option>
+                        <option value="anime">Anime/Stylized</option>
+                    </select>
+                </div>
+                
+                <div id="custom-options" class="form-group">
+                    <!-- Dynamically populated based on content type -->
+                </div>
+                
+                <button id="generate-prompt-btn">Generate Prompt</button>
+                
+                <div id="prompt-result" class="result" style="display: none;">
+                    <button class="copy-button" id="copy-prompt-btn">Copy</button>
+                    <div id="prompt-text"></div>
+                </div>
+            </div>
+            
+            <div id="parameter-guidance" class="card" style="display: none;">
+                <h2>Recommended Parameters</h2>
+                <div id="parameter-recommendations"></div>
+            </div>
+        </div>
+        
+        <!-- Negative Prompts Tab -->
+        <div id="negative-prompts" class="tab-content">
+            <div class="card">
+                <h2>Model-Specific Negative Prompts</h2>
+                <div class="form-group">
+                    <label for="neg-model-select">Select Model</label>
+                    <select id="neg-model-select">
+                        <option value="sdxl">Stable Diffusion XL</option>
+                        <option value="sd15">Stable Diffusion 1.5</option>
+                        <option value="sd21">Stable Diffusion 2.1</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="neg-content-type">Content Type</label>
+                    <select id="neg-content-type">
+                        <option value="portrait">Portrait/Character</option>
+                        <option value="landscape">Landscape/Environment</option>
+                        <option value="concept">Concept Art</option>
+                        <option value="anime">Anime/Stylized</option>
+                    </select>
+                </div>
+                
+                <button id="generate-negative-btn">Generate Negative Prompt</button>
+                
+                <div id="negative-result" class="result" style="display: none;">
+                    <button class="copy-button" id="copy-negative-btn">Copy</button>
+                    <div id="negative-text"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Parameter Optimization Tab -->
+        <div id="parameter-optimization" class="tab-content">
+            <div class="card">
+                <h2>Parameter Optimization</h2>
+                <div class="form-group">
+                    <label for="param-model-select">Select Model</label>
+                    <select id="param-model-select">
+                        <option value="sdxl">Stable Diffusion XL</option>
+                        <option value="sd15">Stable Diffusion 1.5</option>
+                        <option value="sd21">Stable Diffusion 2.1</option>
+                    </select>
+                </div>
+                
+                <button id="get-parameters-btn">Get Parameter Recommendations</button>
+                
+                <div id="params-result" style="display: none;">
+                    <div class="parameter-card">
+                        <div class="parameter-item">
+                            <h3>CFG Scale</h3>
+                            <div id="cfg-guidance"></div>
+                        </div>
+                        
+                        <div class="parameter-item">
+                            <h3>Samplers</h3>
+                            <div id="sampler-guidance"></div>
+                        </div>
+                        
+                        <div class="parameter-item">
+                            <h3>Steps</h3>
+                            <div id="steps-guidance"></div>
+                        </div>
+                        
+                        <div class="parameter-item">
+                            <h3>Strength (img2img)</h3>
+                            <div id="strength-guidance"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="seed-input">Seed Management</label>
+                        <input type="number" id="seed-input" placeholder="Enter seed (or leave blank for random)">
+                        <p class="text-small">Use the same seed to maintain consistency across generations with similar prompts</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ControlNet Guide Tab -->
+        <div id="controlnet-guide" class="tab-content">
+            <div class="card">
+                <h2>ControlNet Integration Guide</h2>
+                <div class="form-group">
+                    <label for="controlnet-select">Select Technique</label>
+                    <select id="controlnet-select">
+                        <option value="openPose">Open Pose</option>
+                        <option value="cannyEdge">Canny Edge (Kenny Mode)</option>
+                        <option value="depth">Depth</option>
+                        <option value="lineArt">Line Art</option>
+                        <option value="ipAdapter">IP Adapter</option>
+                    </select>
+                </div>
+                
+                <button id="get-controlnet-btn">Get Implementation Guide</button>
+                
+                <div id="controlnet-result" class="controlnet-info" style="display: none;"></div>
+            </div>
+        </div>
+        
+        <!-- Result Analysis Tab -->
+        <div id="result-analysis" class="tab-content">
+            <div class="card">
+                <h2>Result Analysis Tools</h2>
+                <div class="form-group">
+                    <label for="issue-type">Issue Category</label>
+                    <select id="issue-type">
+                        <option value="quality">Quality Issues</option>
+                        <option value="portrait">Portrait/Character Issues</option>
+                        <option value="landscape">Landscape/Environment Issues</option>
+                        <option value="common">Common Problems</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="specific-problem">Specific Issue (Optional)</label>
+                    <select id="specific-problem">
+                        <option value="">General advice</option>
+                        <!-- Options will be populated based on issue type -->
+                    </select>
+                </div>
+                
+                <button id="analyze-btn">Get Analysis & Solutions</button>
+                
+                <div id="analysis-result" style="display: none;" class="result"></div>
+            </div>
+        </div>
+        
+        <!-- Modifier Library Tab -->
+        <div id="modifier-library" class="tab-content">
+            <div class="card">
+                <h2>Comprehensive Modifier Library</h2>
+                <div class="form-group">
+                    <label for="modifier-category">Category</label>
+                    <select id="modifier-category">
+                        <option value="photography">Photography</option>
+                        <option value="artMediums">Art Mediums</option>
+                        <option value="artists">Artists</option>
+                        <option value="enhancers">Quality Enhancers</option>
+                    </select>
+                </div>
+                
+                <div class="form-group" id="subcategory-container" style="display: none;">
+                    <label for="modifier-subcategory">Sub-Category</label>
+                    <select id="modifier-subcategory">
+                        <!-- Options will be populated based on category -->
+                    </select>
+                </div>
+                
+                <button id="get-modifiers-btn">Get Modifiers</button>
+                
+                <div id="modifiers-result" style="display: none;" class="grid"></div>
+            </div>
+        </div>
+        
+        <!-- Example Prompts Tab -->
+        <div id="examples" class="tab-content">
+            <div class="card">
+                <h2>Example Prompts</h2>
+                <p>Optimized prompt examples based on model and use case</p>
+                
+                <div class="examples-container">
+                    <div class="example-item">
+                        <h3>SDXL Portrait</h3>
+                        <div class="example-prompt">A medieval knight, standing on a battlefield at sunset, cinematic lighting, high fidelity, ultra-detailed</div>
+                        <button class="copy-example-btn" data-text="A medieval knight, standing on a battlefield at sunset, cinematic lighting, high fidelity, ultra-detailed">Copy</button>
+                    </div>
+                    
+                    <div class="example-item">
+                        <h3>SD 1.5 Urban</h3>
+                        <div class="example-prompt">A futuristic cityscape, neon lights, flying cars, trending on artstation, highly detailed</div>
+                        <button class="copy-example-btn" data-text="A futuristic cityscape, neon lights, flying cars, trending on artstation, highly detailed">Copy</button>
+                    </div>
+                    
+                    <div class="example-item">
+                        <h3>SD 1.5 Portrait</h3>
+                        <div class="example-prompt">A close-up portrait of a young woman with freckles, highly detailed, professional photograph, sharp focus</div>
+                        <button class="copy-example-btn" data-text="A close-up portrait of a young woman with freckles, highly detailed, professional photograph, sharp focus">Copy</button>
+                    </div>
+                    
+                    <div class="example-item">
+                        <h3>SD 2.1 Concept</h3>
+                        <div class="example-prompt">An abstract concept art piece, swirling colors, vibrant, cinematic style, ultra-detailed</div>
+                        <button class="copy-example-btn" data-text="An abstract concept art piece, swirling colors, vibrant, cinematic style, ultra-detailed">Copy</button>
+                    </div>
+                    
+                    <div class="example-item">
+                        <h3>SDXL Urban</h3>
+                        <div class="example-prompt">A cyberpunk alley, rain, neon signs, cinematic lighting, high fidelity, ultra-detailed</div>
+                        <button class="copy-example-btn" data-text="A cyberpunk alley, rain, neon signs, cinematic lighting, high fidelity, ultra-detailed">Copy</button>
+                    </div>
+                    
+                    <div class="example-item">
+                        <h3>SD 2.1 Landscape</h3>
+                        <div class="example-prompt">A serene landscape, mountains, a lake, natural lighting, ultra-detailed, wide shot</div>
+                        <button class="copy-example-btn" data-text="A serene landscape, mountains, a lake, natural lighting, ultra-detailed, wide shot">Copy</button>
+                    </div>
+                    
+                    <div class="example-item">
+                        <h3>SD 1.5 Anime</h3>
+                        <div class="example-prompt">An anime character, exaggerated features, futuristic setting, highly detailed, trending on artstation</div>
+                        <button class="copy-example-btn" data-text="An anime character, exaggerated features, futuristic setting, highly detailed, trending on artstation">Copy</button>
+                    </div>
+                    
+                    <div class="example-item">
+                        <h3>SDXL Surreal</h3>
+                        <div class="example-prompt">A surreal scene, melting clocks in a desert, cinematic lighting, high fidelity, ultra-detailed</div>
+                        <button class="copy-example-btn" data-text="A surreal scene, melting clocks in a desert, cinematic lighting, high fidelity, ultra-detailed">Copy</button>
+                    </div>
+                    
+                    <div class="example-item">
+                        <h3>SD 2.1 Concept</h3>
+                        <div class="example-prompt">A detailed sketch of a robot, intricate gears, technical drawing, ultra-detailed, sharp focus</div>
+                        <button class="copy-example-btn" data-text="A detailed sketch of a robot, intricate gears, technical drawing, ultra-detailed, sharp focus">Copy</button>
+                    </div>
+                    
+                    <div class="example-item">
+                        <h3>SDXL Still Life</h3>
+                        <div class="example-prompt">A vibrant still life, fruits on a table, rich colors, ultra high definition, professional photograph, highly detailed</div>
+                        <button class="copy-example-btn" data-text="A vibrant still life, fruits on a table, rich colors, ultra high definition, professional photograph, highly detailed">Copy</button>
+                    </div>
+                    
+                    <div class="example-item">
+                        <h3>SD 2.1 Landscape</h3>
+                        <div class="example-prompt">A dreamy forest scene, mist, soft natural lighting, ultra-detailed, atmospheric</div>
+                        <button class="copy-example-btn" data-text="A dreamy forest scene, mist, soft natural lighting, ultra-detailed, atmospheric">Copy</button>
+                    </div>
+                    
+                    <div class="example-item">
+                        <h3>SD 1.5 Portrait</h3>
+                        <div class="example-prompt">A futuristic portrait of a cyborg, metallic skin, digital art, highly detailed, trending on artstation</div>
+                        <button class="copy-example-btn" data-text="A futuristic portrait of a cyborg, metallic skin, digital art, highly detailed, trending on artstation">Copy</button>
+                    </div>
+                    
+                    <div class="example-item">
+                        <h3>SDXL Landscape</h3>
+                        <div class="example-prompt">An impressionistic painting, sunrise over a quiet lake, soft brush strokes, cinematic lighting, ultra-detailed</div>
+                        <button class="copy-example-btn" data-text="An impressionistic painting, sunrise over a quiet lake, soft brush strokes, cinematic lighting, ultra-detailed">Copy</button>
+                    </div>
+                    
+                    <div class="example-item">
+                        <h3>SD 2.1 Concept</h3>
+                        <div class="example-prompt">A hyper-realistic rendering of a futuristic sports car, dynamic motion, racetrack setting, ultra-detailed, cinematic quality</div>
+                        <button class="copy-example-btn" data-text="A hyper-realistic rendering of a futuristic sports car, dynamic motion, racetrack setting, ultra-detailed, cinematic quality">Copy</button>
+                    </div>
+                    
+                    <div class="example-item">
+                        <h3>SDXL Fantasy</h3>
+                        <div class="example-prompt">A whimsical illustration of a fairy tale castle, surrounded by lush greenery, vibrant colors, ultra-detailed, cinematic lighting</div>
+                        <button class="copy-example-btn" data-text="A whimsical illustration of a fairy tale castle, surrounded by lush greenery, vibrant colors, ultra-detailed, cinematic lighting">Copy</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <div class="container">
+            <p>Stable Diffusion Prompt Assistant - For optimal results with SD models</p>
+        </div>
+    </footer>
+    
+    <script src="js/data.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
