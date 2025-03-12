@@ -1,4 +1,32 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Content type modifiers mapping
+    const contentTypeModifiers = {
+        portrait: ['lighting', 'style', 'expression', 'clothing', 'background'],
+        landscape: ['time', 'weather', 'lighting', 'perspective', 'style'],
+        concept: ['style', 'lighting', 'perspective', 'details', 'mood'],
+        urban: ['lighting', 'time', 'weather', 'style', 'details'],
+        anime: ['style', 'details', 'expression', 'background', 'colors'],
+        surreal: ['style', 'elements', 'colors', 'mood', 'perspective'],
+        fantasy: ['lighting', 'environment', 'style', 'details', 'atmosphere'],
+        stillLife: ['lighting', 'arrangement', 'style', 'colors', 'mood']
+    };
+
+    // Negative prompt category definitions
+    const negativeCategories = [
+        { id: 'quality', label: 'Quality Issues', terms: 'low quality, blurry, pixelated, jpeg artifacts, compression artifacts, watermark, signature' },
+        { id: 'anatomy', label: 'Anatomical Issues', terms: 'bad anatomy, deformed, disfigured, mutated, extra limbs, missing limbs, extra fingers, fewer digits' },
+        { id: 'composition', label: 'Composition Issues', terms: 'poorly framed, unbalanced, bad composition, low contrast, cropped, out of frame' },
+        { id: 'technical', label: 'Technical Issues', terms: 'text, words, font, logo, distorted, warped perspective, unrealistic proportions' }
+    ];
+
+    // Initialize tooltips
+    function initTooltips() {
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    }
+
     // Helper functions
     function weightWord(word, model, emphasis) {
         const defaultEmphasis = 1.1;
@@ -23,6 +51,66 @@ document.addEventListener('DOMContentLoaded', () => {
         } else { // sd21
             return `(${word}:${actualEmphasis.toFixed(1)})`;
         }
+    }
+    
+    // Token counting and optimization
+    function countTokens(text) {
+        // Simple approximation: split by spaces and punctuation
+        return text.split(/[\s,.!?;:()\[\]{}'"]+/).filter(Boolean).length;
+    }
+    
+    function updateTokenCount(text) {
+        const tokenCount = countTokens(text);
+        const tokenCountElement = document.getElementById('tokenCount');
+        if (tokenCountElement) {
+            tokenCountElement.textContent = tokenCount;
+            
+            // Visual feedback based on token count
+            if (tokenCount > 60) {
+                tokenCountElement.className = 'badge bg-danger me-2';
+            } else if (tokenCount > 45) {
+                tokenCountElement.className = 'badge bg-warning me-2';
+            } else {
+                tokenCountElement.className = 'badge bg-success me-2';
+            }
+        }
+        
+        // Provide optimization suggestions
+        const optimizationSuggestions = suggestOptimizations(text, tokenCount);
+        const tokenOptimizationElement = document.getElementById('token-optimization');
+        if (tokenOptimizationElement && optimizationSuggestions.length > 0) {
+            tokenOptimizationElement.innerHTML = '<strong>Optimization tips:</strong> ' + 
+                optimizationSuggestions.map(s => `<span class="text-danger">• ${s}</span>`).join('<br>');
+        } else if (tokenOptimizationElement) {
+            tokenOptimizationElement.innerHTML = '';
+        }
+        
+        return tokenCount;
+    }
+    
+    function suggestOptimizations(prompt, tokenCount) {
+        const suggestions = [];
+        
+        if (tokenCount > 60) {
+            suggestions.push('Your prompt is approaching the token limit. Consider reducing descriptive terms.');
+        }
+        
+        // Check for redundant adjectives
+        const tokens = prompt.split(/\s+/);
+        const adjectives = tokens.filter(t => t.endsWith('ing') || t.endsWith('ed') || t.endsWith('ive'));
+        if (adjectives.length > 5) {
+            suggestions.push('Multiple descriptive adjectives detected - consider consolidating similar terms.');
+        }
+        
+        // Check for repetitive style mentions
+        const styles = tokens.filter(t => 
+            ['style', 'artistic', 'painting', 'photo', 'render', 'quality', 'detailed'].some(s => t.includes(s))
+        );
+        if (styles.length > 3) {
+            suggestions.push('Multiple style references detected - consider focusing on the most important style terms.');
+        }
+        
+        return suggestions;
     }
 
     function generatePrompt(model, contentType, options) {
@@ -217,12 +305,236 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     // Initialize custom options
+    // Setup negative categories
+    function setupNegativeCategories() {
+        const container = document.getElementById('negativeCategories');
+        if (!container) return;
+        
+        container.innerHTML = '';
+        
+        negativeCategories.forEach(cat => {
+            const div = document.createElement('div');
+            div.className = 'form-check mb-2';
+            
+            const input = document.createElement('input');
+            input.type = 'checkbox';
+            input.className = 'form-check-input';
+            input.id = `neg-${cat.id}`;
+            input.setAttribute('data-terms', cat.terms);
+            input.checked = cat.id === 'quality'; // Check quality issues by default
+            input.addEventListener('change', updateNegativePreview);
+            
+            const label = document.createElement('label');
+            label.className = 'form-check-label';
+            label.htmlFor = `neg-${cat.id}`;
+            label.textContent = cat.label;
+            
+            const small = document.createElement('small');
+            small.className = 'form-text text-muted d-block';
+            small.textContent = cat.terms;
+            
+            div.append(input, label, small);
+            container.appendChild(div);
+        });
+    }
+    
+    // Create toggle buttons for modifiers
+    function createModifierToggles() {
+        const container = document.getElementById('modifier-toggles');
+        if (!container) return;
+        
+        const contentType = contentTypeSelect.value;
+        const modifiers = contentTypeModifiers[contentType] || [];
+        
+        container.innerHTML = '';
+        
+        modifiers.forEach(modifier => {
+            const col = document.createElement('div');
+            col.className = 'col-6 col-md-4 col-lg-3 mb-2';
+            
+            const card = document.createElement('div');
+            card.className = 'card h-100';
+            
+            const cardBody = document.createElement('div');
+            cardBody.className = 'card-body p-2';
+            
+            const label = document.createElement('div');
+            label.className = 'fw-bold mb-2 small';
+            label.textContent = modifier.charAt(0).toUpperCase() + modifier.slice(1);
+            
+            const buttonGroup = document.createElement('div');
+            buttonGroup.className = 'btn-group btn-group-sm d-flex flex-wrap gap-1';
+            
+            // Get appropriate options based on modifier type
+            let options = [];
+            switch (modifier) {
+                case 'lighting':
+                    options = ['soft', 'dramatic', 'cinematic', 'natural', 'studio'];
+                    break;
+                case 'style':
+                    options = ['realistic', 'stylized', 'anime', 'fantasy', 'cinematic'];
+                    break;
+                case 'expression':
+                    options = ['happy', 'serious', 'calm', 'intense', 'thoughtful'];
+                    break;
+                case 'clothing':
+                    options = ['casual', 'formal', 'fantasy', 'medieval', 'futuristic'];
+                    break;
+                case 'background':
+                    options = ['simple', 'nature', 'urban', 'studio', 'gradient'];
+                    break;
+                case 'time':
+                    options = ['day', 'night', 'sunrise', 'sunset', 'golden hour'];
+                    break;
+                case 'weather':
+                    options = ['clear', 'cloudy', 'rainy', 'foggy', 'snowy'];
+                    break;
+                case 'perspective':
+                    options = ['closeup', 'medium', 'wide', 'aerial', 'panoramic'];
+                    break;
+                case 'details':
+                    options = ['detailed', 'minimal', 'intricate', 'simple', 'ornate'];
+                    break;
+                case 'colors':
+                    options = ['vibrant', 'muted', 'monochrome', 'pastel', 'dark'];
+                    break;
+                case 'mood':
+                    options = ['serene', 'dramatic', 'mysterious', 'cheerful', 'gloomy'];
+                    break;
+                case 'elements':
+                    options = ['water', 'fire', 'nature', 'abstract', 'geometric'];
+                    break;
+                case 'atmosphere':
+                    options = ['magical', 'ethereal', 'gritty', 'dreamlike', 'peaceful'];
+                    break;
+                case 'arrangement':
+                    options = ['organized', 'chaotic', 'balanced', 'centered', 'asymmetric'];
+                    break;
+                case 'environment':
+                    options = ['forest', 'mountains', 'coast', 'city', 'fantasy'];
+                    break;
+                default:
+                    options = ['option 1', 'option 2', 'option 3'];
+            }
+            
+            options.forEach(option => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'btn btn-outline-primary btn-sm mb-1 me-1';
+                btn.textContent = option;
+                btn.dataset.modifier = modifier;
+                btn.dataset.value = option;
+                btn.onclick = () => {
+                    btn.classList.toggle('active');
+                    updatePromptPreview();
+                };
+                buttonGroup.appendChild(btn);
+            });
+            
+            cardBody.append(label, buttonGroup);
+            card.appendChild(cardBody);
+            col.appendChild(card);
+            container.appendChild(col);
+        });
+    }
+    
+    // Get selected modifiers from toggle buttons
+    function getSelectedModifiers() {
+        const modifiers = {};
+        const activeButtons = document.querySelectorAll('#modifier-toggles .btn.active');
+        
+        activeButtons.forEach(btn => {
+            const category = btn.dataset.modifier;
+            const value = btn.dataset.value;
+            
+            if (!modifiers[category]) {
+                modifiers[category] = [];
+            }
+            
+            modifiers[category].push(value);
+        });
+        
+        return modifiers;
+    }
+    
+    // Update the prompt preview
+    function updatePromptPreview() {
+        const baseConcept = document.getElementById('baseConceptField').value;
+        const model = modelSelect.value;
+        const contentType = contentTypeSelect.value;
+        const modifiers = getSelectedModifiers();
+        
+        // Build the prompt from base concept and modifiers
+        let previewPrompt = baseConcept;
+        
+        // Add selected modifiers
+        Object.entries(modifiers).forEach(([category, values]) => {
+            if (values.length > 0) {
+                previewPrompt += `, ${values.join(' and ')} ${category}`;
+            }
+        });
+        
+        // Add model-specific quality enhancers
+        if (model === 'sdxl') {
+            previewPrompt += ', ultra-detailed, high fidelity';
+        } else if (model === 'sd15') {
+            previewPrompt += ', highly detailed, trending on artstation';
+        } else if (model === 'sd21') {
+            previewPrompt += ', ultra-detailed, sharp focus';
+        }
+        
+        const promptPreview = document.getElementById('promptPreview');
+        if (promptPreview) {
+            promptPreview.textContent = previewPrompt;
+            updateTokenCount(previewPrompt);
+        }
+    }
+    
+    // Update negative prompt preview
+    function updateNegativePreview() {
+        const model = document.getElementById('neg-model-select').value;
+        const contentType = document.getElementById('neg-content-type').value;
+        
+        // Get base negative prompt
+        let negativePrompt = modelData[model]?.negativePromptBase || '';
+        
+        // Add content-specific negative terms
+        const contentNegative = contentTemplates[contentType]?.negativeAdditions || '';
+        if (contentNegative) {
+            negativePrompt += ', ' + contentNegative;
+        }
+        
+        // Add selected category terms
+        const checkedCategories = document.querySelectorAll('#negativeCategories input:checked');
+        checkedCategories.forEach(checkbox => {
+            const terms = checkbox.getAttribute('data-terms');
+            if (terms) {
+                negativePrompt += ', ' + terms;
+            }
+        });
+        
+        return negativePrompt;
+    }
+
+    // Initialize functions
     updateCustomOptions();
+    createModifierToggles();
+    setupNegativeCategories();
+    initTooltips();
+    
+    // Event listeners for updates
+    document.getElementById('baseConceptField')?.addEventListener('input', updatePromptPreview);
+    contentTypeSelect?.addEventListener('change', () => {
+        updateCustomOptions();
+        createModifierToggles();
+        updatePromptPreview();
+    });
     
     // Generate prompt
     generatePromptBtn.addEventListener('click', () => {
         const model = modelSelect.value;
         const contentType = contentTypeSelect.value;
+        const baseConcept = document.getElementById('baseConceptField').value;
         const options = {};
         
         // Gather custom options
@@ -234,6 +546,17 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
         
+        // Get modifiers
+        const modifiers = getSelectedModifiers();
+        Object.entries(modifiers).forEach(([category, values]) => {
+            options[category] = values.join(' and ');
+        });
+        
+        // Include base concept if provided
+        if (baseConcept) {
+            options.baseConcept = baseConcept;
+        }
+        
         const result = generatePrompt(model, contentType, options);
         
         if (result.error) {
@@ -242,7 +565,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         // Format prompt based on model-specific optimizations from test data
-        let formattedPrompt = result.prompt;
+        let formattedPrompt = baseConcept ? baseConcept + ', ' + result.prompt : result.prompt;
         
         // Model-specific optimizations
         if (model === 'sdxl') {
@@ -272,6 +595,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 formattedPrompt = formattedPrompt.replace(/lighting/, 'atmospheric, lighting');
             }
         }
+        
+        // Update token count
+        updateTokenCount(formattedPrompt);
         
         promptText.textContent = formattedPrompt;
         promptResult.style.display = 'block';
