@@ -4,391 +4,173 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stable Diffusion Prompt Assistant</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-            background-color: #f8f9fa;
-            padding: 20px;
-        }
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-        }
-        .card {
-            margin-bottom: 20px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            border: none;
-        }
-        .card-header {
-            background-color: #6c5ce7;
-            color: white;
-            font-weight: 600;
-        }
-        .badge {
-            font-size: 0.9em;
-        }
-        .preview-box {
-            min-height: 100px;
-            border: 1px solid #dee2e6;
-            border-radius: 4px;
-            padding: 10px;
-            background-color: #f8f9fa;
-            margin-bottom: 15px;
-            font-family: monospace;
-        }
-        .btn-primary {
-            background-color: #6c5ce7;
-            border-color: #6c5ce7;
-        }
-        .btn-primary:hover {
-            background-color: #5b4ac9;
-            border-color: #5b4ac9;
-        }
-        .parameter-group {
-            margin-bottom: 20px;
-        }
-        .parameter-label {
-            font-weight: 600;
-            margin-bottom: 8px;
-        }
-        .param-option {
-            display: inline-block;
-            padding: 6px 10px;
-            margin-right: 10px;
-            margin-bottom: 10px;
-            border: 1px solid #dee2e6;
-            border-radius: 4px;
-            cursor: pointer;
-            background-color: white;
-        }
-        .param-option.active {
-            background-color: #6c5ce7;
-            color: white;
-            border-color: #6c5ce7;
-        }
-        .tab-content {
-            padding: 20px;
-            background-color: white;
-            border-radius: 0 0 5px 5px;
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <header>
+        <h1>Stable Diffusion Prompt Assistant</h1>
+        <p>Build optimized prompts for AI image generation</p>
+    </header>
+
     <div class="container">
-        <h1 class="text-center mb-4">Stable Diffusion Prompt Assistant</h1>
-        
-        <div class="card">
-            <div class="card-header">Input</div>
-            <div class="card-body">
-                <div class="mb-3">
-                    <label for="baseConceptField" class="form-label">What do you want to generate?</label>
-                    <input type="text" class="form-control form-control-lg" id="baseConceptField" 
-                           placeholder="Enter your base concept here (e.g., 'a portrait of a cyberpunk warrior')">
+        <div class="sidebar">
+            <h2>Tools</h2>
+            <ul id="tools">
+                <li><a href="#" data-tab="prompt-builder" class="active">Prompt Builder</a></li>
+                <li><a href="#" data-tab="negative-prompts">Negative Prompts</a></li>
+                <li><a href="#" data-tab="parameter-optimizer">Parameter Optimizer</a></li>
+                <li><a href="#" data-tab="result-analyzer">Result Analyzer</a></li>
+                <li><a href="#" data-tab="advanced-techniques">Advanced Techniques</a></li>
+                <li><a href="#" data-tab="content-templates">Content Templates</a></li>
+                <li><a href="#" data-tab="openart-models">OpenArt AI Models</a></li>
+                <li><a href="#" data-tab="controlnet-guidance">ControlNet Guidance</a></li>
+            </ul>
+        </div>
+
+        <div class="main-content">
+            <div id="prompt-builder" class="tab-content active">
+                <h2>Prompt Builder</h2>
+                <p>Select your model and build an effective prompt</p>
+                
+                <div class="model-selector">
+                    <div class="model-button active" data-model="sdxl">Stable Diffusion XL</div>
+                    <div class="model-button" data-model="sd15">Stable Diffusion 1.5</div>
+                    <div class="model-button" data-model="sd21">Stable Diffusion 2.1</div>
+                    <div class="model-button" data-model="juggernautxl">Juggernaut XL</div>
+                    <div class="model-button" data-model="fluxdev">Flux (Dev)</div>
+                    <div class="model-button" data-model="juggernautfluxpro">Juggernaut Flux Pro</div>
+                    <div class="model-button" data-model="fluxpro">Flux (Pro)</div>
+                    <div class="model-button" data-model="sdxlfilm">SDXL Film</div>
                 </div>
                 
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <label for="modelSelect" class="form-label">Model</label>
-                        <select class="form-select" id="modelSelect">
-                            <option value="sdxl">Stable Diffusion XL</option>
-                            <option value="sd15">Stable Diffusion 1.5</option>
-                            <option value="sd21">Stable Diffusion 2.1</option>
-                        </select>
-                    </div>
-                    <div class="col-md-6">
-                        <label for="contentType" class="form-label">Content Type</label>
-                        <select class="form-select" id="contentType">
-                            <option value="portrait">Portrait/Character</option>
-                            <option value="landscape">Landscape/Environment</option>
-                            <option value="abstract">Abstract</option>
-                            <option value="concept">Concept Art</option>
-                            <option value="anime">Anime/Stylized</option>
-                        </select>
-                    </div>
+                <div class="model-info" id="model-specific-info">
+                    <p><strong>SDXL Notes:</strong> Less reliant on explicit quality terms, handles longer contexts better, more literal interpretation</p>
                 </div>
                 
-                <!-- Content Specific Modifiers -->
-                <div id="modifiersContainer" class="row mb-3">
-                    <!-- Will be dynamically populated -->
-                </div>
-                
-                <div class="mb-3">
-                    <label class="form-label">Prompt Preview <span class="badge bg-secondary" id="tokenCount">0</span> tokens</label>
-                    <div class="preview-box" id="promptPreview">Your prompt will appear here...</div>
-                    <div id="tokenWarning" class="text-danger small"></div>
-                </div>
-                
-                <div class="d-grid gap-2">
-                    <button class="btn btn-primary btn-lg" id="generateBtn">Generate Optimized Prompt</button>
+                <div class="panel">
+                    <h3>Model information demo</h3>
+                    <p>Click on each model to see it selected. This demonstrates that all the models are properly added to the UI.</p>
                 </div>
             </div>
-        </div>
-        
-        <div class="card" id="resultCard" style="display: none;">
-            <div class="card-header">Results</div>
-            <div class="card-body">
-                <!-- Tab navigation -->
-                <ul class="nav nav-tabs" id="resultTabs" role="tablist">
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link active" id="prompt-tab" data-bs-toggle="tab" data-bs-target="#prompt-content" type="button" role="tab">Optimized Prompt</button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="negative-tab" data-bs-toggle="tab" data-bs-target="#negative-content" type="button" role="tab">Negative Prompt</button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="parameters-tab" data-bs-toggle="tab" data-bs-target="#parameters-content" type="button" role="tab">Parameters</button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="kling-tab" data-bs-toggle="tab" data-bs-target="#kling-content" type="button" role="tab">Kling Motion</button>
-                    </li>
-                </ul>
+            
+            <div id="openart-models" class="tab-content">
+                <h2>OpenArt AI Models</h2>
+                <p>Learn about specialized OpenArt AI models and their optimal parameters</p>
                 
-                <!-- Tab content -->
-                <div class="tab-content" id="resultTabsContent">
-                    <!-- Optimized Prompt Tab -->
-                    <div class="tab-pane fade show active" id="prompt-content" role="tabpanel">
-                        <div class="mb-3">
-                            <label class="form-label">Optimized Prompt</label>
-                            <div class="position-relative">
-                                <div class="preview-box" id="finalPrompt"></div>
-                                <button class="btn btn-sm btn-primary position-absolute top-0 end-0 m-2" id="copyPromptBtn">Copy</button>
-                            </div>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label class="form-label">Export Format</label>
-                            <div class="input-group">
-                                <select class="form-select" id="exportFormat">
-                                    <option value="plaintext">Plain Text</option>
-                                    <option value="automatic1111">Automatic1111</option>
-                                    <option value="comfyui">ComfyUI</option>
-                                    <option value="invokeai">InvokeAI</option>
-                                </select>
-                                <button class="btn btn-outline-secondary" type="button" id="exportBtn">Export</button>
-                            </div>
-                        </div>
-                    </div>
+                <div class="panel">
+                    <h3>Juggernaut XL</h3>
+                    <p>Advanced SDXL-based model fine-tuned on 15,000 recaptioned images, exceptional for photorealistic portraits.</p>
+                    <ul>
+                        <li><strong>Optimal Resolution:</strong> 832×1216 for portraits, works with any standard SDXL resolution</li>
+                        <li><strong>Best Sampler:</strong> DPM++ 2M SDE with 30-40 steps and CFG scale 3-6</li>
+                        <li><strong>Ideal Use Cases:</strong> Photorealistic portraits, detailed human subjects</li>
+                        <li><strong>Prompting Style:</strong> Responds well to both keyword-style and natural language instructions</li>
+                    </ul>
+                </div>
+                
+                <div class="panel">
+                    <h3>Flux Models</h3>
+                    <p>OpenArt's proprietary models with different specialized capabilities:</p>
                     
-                    <!-- Negative Prompt Tab -->
-                    <div class="tab-pane fade" id="negative-content" role="tabpanel">
-                        <div class="mb-3">
-                            <label class="form-label">Negative Prompt</label>
-                            <div class="position-relative">
-                                <div class="preview-box" id="negativePrompt"></div>
-                                <button class="btn btn-sm btn-primary position-absolute top-0 end-0 m-2" id="copyNegativeBtn">Copy</button>
-                            </div>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label class="form-label">Negative Categories</label>
-                            <div id="negativeCategories" class="row">
-                                <div class="col-md-6">
-                                    <div class="form-check mb-2">
-                                        <input class="form-check-input negative-category" type="checkbox" id="negQuality" checked>
-                                        <label class="form-check-label" for="negQuality">Quality Issues</label>
-                                    </div>
-                                    <div class="form-check mb-2">
-                                        <input class="form-check-input negative-category" type="checkbox" id="negAnatomy" checked>
-                                        <label class="form-check-label" for="negAnatomy">Anatomical Issues</label>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-check mb-2">
-                                        <input class="form-check-input negative-category" type="checkbox" id="negText" checked>
-                                        <label class="form-check-label" for="negText">Text & Watermarks</label>
-                                    </div>
-                                    <div class="form-check mb-2">
-                                        <input class="form-check-input negative-category" type="checkbox" id="negComposition">
-                                        <label class="form-check-label" for="negComposition">Composition Issues</label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <h4>Flux (Dev)</h4>
+                    <ul>
+                        <li><strong>Key Strengths:</strong> Realistic image generation with accurate text incorporation</li>
+                        <li><strong>Best For:</strong> Mock-ups, product visualizations, content with text elements</li>
+                        <li><strong>Optimal Steps:</strong> 28+ steps for complex images</li>
+                        <li><strong>Versatility:</strong> Excels across diverse subjects from fantasy to architecture</li>
+                    </ul>
                     
-                    <!-- Parameters Tab -->
-                    <div class="tab-pane fade" id="parameters-content" role="tabpanel">
-                        <div class="parameter-group">
-                            <label class="parameter-label">CFG Scale</label>
-                            <div id="cfgOptions">
-                                <div class="param-option" data-value="5">Low (5)</div>
-                                <div class="param-option active" data-value="7.5">Medium (7.5)</div>
-                                <div class="param-option" data-value="12">High (12)</div>
-                                <div class="param-option" data-value="custom">Custom</div>
-                            </div>
-                            <input type="range" class="form-range" min="1" max="15" step="0.5" value="7.5" id="cfgSlider">
-                            <div class="small text-muted">
-                                Low: More creative but less prompt adherence<br>
-                                Medium: Balanced results<br>
-                                High: Strict prompt adherence but less creative
-                            </div>
-                        </div>
-                        
-                        <div class="parameter-group">
-                            <label class="parameter-label">Steps</label>
-                            <div id="stepsOptions">
-                                <div class="param-option" data-value="20">Quick (20)</div>
-                                <div class="param-option active" data-value="30">Standard (30)</div>
-                                <div class="param-option" data-value="50">Detailed (50)</div>
-                                <div class="param-option" data-value="custom">Custom</div>
-                            </div>
-                            <input type="range" class="form-range" min="10" max="50" step="1" value="30" id="stepsSlider">
-                            <div class="small text-muted">
-                                Quick: Faster generation but less detail<br>
-                                Standard: Good balance of speed and detail<br>
-                                Detailed: Maximum quality but slower generation
-                            </div>
-                        </div>
-                        
-                        <div class="parameter-group">
-                            <label class="parameter-label">Sampler</label>
-                            <div id="samplerOptions">
-                                <div class="param-option" data-value="ddim">DDIM</div>
-                                <div class="param-option active" data-value="euler_a">Euler a</div>
-                                <div class="param-option" data-value="dpm_2m">DPM++ 2M Karras</div>
-                                <div class="param-option" data-value="dpm_sde">DPM++ SDE Karras</div>
-                            </div>
-                            <div class="small text-muted" id="samplerDescription">
-                                Euler a: Good general-purpose sampler with balance of detail and speed
-                            </div>
-                        </div>
-                        
-                        <div class="parameter-group">
-                            <label class="parameter-label">Seed Management</label>
-                            <div class="input-group mb-3">
-                                <input type="number" class="form-control" id="seedInput" placeholder="Enter seed (optional)">
-                                <button class="btn btn-outline-secondary" type="button" id="randomSeedBtn">Random</button>
-                            </div>
-                            <div class="small text-muted">
-                                Using the same seed will produce consistent results with similar prompts
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Kling AI Motion Tab -->
-                    <div class="tab-pane fade" id="kling-content" role="tabpanel">
-                        <div class="mb-3">
-                            <div class="alert alert-info">
-                                <strong>About Kling AI Motion:</strong> Designed for image-to-video motion prompts. Focus on describing movement rather than visual elements.
-                            </div>
-                            
-                            <div class="mb-3">
-                                <label class="form-label">Natural Language Description</label>
-                                <textarea class="form-control" id="klingNaturalInput" rows="3" placeholder="Describe the motion you want, e.g., 'the camera slowly zooms in as the character turns to face the viewer'"></textarea>
-                            </div>
-                            
-                            <div class="d-grid mb-3">
-                                <button class="btn btn-primary" id="generateKlingBtn">Generate Motion Prompt</button>
-                            </div>
-                            
-                            <div class="position-relative mb-3" id="klingMotionResult" style="display: none;">
-                                <label class="form-label">Motion Prompt</label>
-                                <div class="preview-box" id="klingMotionPrompt"></div>
-                                <button class="btn btn-sm btn-primary position-absolute top-0 end-0 m-2" id="copyKlingBtn">Copy</button>
-                            </div>
-                            
-                            <div class="row mt-4">
-                                <div class="col-md-6">
-                                    <h5>Tips for Good Motion Prompts</h5>
-                                    <ul class="small">
-                                        <li>Focus on <strong>movement</strong>, not static details</li>
-                                        <li>Specify camera movements (pan, tilt, zoom)</li>
-                                        <li>Include timing information (slow, fast, gradual)</li>
-                                        <li>Describe interactions with environment</li>
-                                        <li>Keep descriptions concise and specific</li>
-                                    </ul>
-                                </div>
-                                <div class="col-md-6">
-                                    <h5>Recommended Settings</h5>
-                                    <ul class="small">
-                                        <li><strong>Image Fidelity:</strong> 0.6-0.8 for best balance</li>
-                                        <li><strong>Motion Strength:</strong> 0.7-0.9 for clear movement</li>
-                                        <li><strong>FPS:</strong> 20-30 for smooth motion</li>
-                                        <li>Use motion brush for specific movement paths</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <h4>Flux (Pro)</h4>
+                    <ul>
+                        <li><strong>Enhanced Features:</strong> Improved detail rendering, consistency, and prompt adherence</li>
+                        <li><strong>Ideal For:</strong> Professional applications requiring precision</li>
+                    </ul>
+                </div>
+                
+                <div class="panel">
+                    <h3>Juggernaut Flux Pro</h3>
+                    <p>Flagship collaboration model designed for photorealistic excellence:</p>
+                    <ul>
+                        <li><strong>Key Improvements:</strong> Superior sharpness, optimized contrast, improved focus, reduced artifacts</li>
+                        <li><strong>Major Advantage:</strong> Elimination of "wax effect" for natural skin textures</li>
+                        <li><strong>Resolution Support:</strong> Up to 1536×1536, handles unusual aspect ratios well</li>
+                        <li><strong>Best For:</strong> Professional photorealistic imagery with natural textures</li>
+                    </ul>
+                </div>
+                
+                <div class="panel">
+                    <h3>SDXL Film Photography Style</h3>
+                    <p>LoRA component that adds authentic film photography aesthetics:</p>
+                    <ul>
+                        <li><strong>Application:</strong> Apply with 0.8 strength, works best with photorealistic base models</li>
+                        <li><strong>Trigger Words:</strong> "film photography style," "light grain," "medium grain," "heavy grain"</li>
+                        <li><strong>Technical Settings:</strong> DPM++ 2M Karras sampler with 30+ steps at 1024×1024</li>
+                        <li><strong>Notes:</strong> PNG format recommended over JPG to preserve grain texture</li>
+                    </ul>
+                </div>
+                
+                <div class="panel">
+                    <h3>Strategic Model Selection</h3>
+                    <ul>
+                        <li><strong>Portraits with Detail:</strong> Juggernaut XL</li>
+                        <li><strong>Text Integration:</strong> Flux (Dev)</li>
+                        <li><strong>Maximum Photorealism:</strong> Juggernaut Flux Pro</li>
+                        <li><strong>Professional Use:</strong> Flux (Pro)</li>
+                        <li><strong>Film Photography Look:</strong> SDXL Film Photography Style + Juggernaut XL</li>
+                    </ul>
                 </div>
             </div>
         </div>
     </div>
-    
-    <div class="card" id="simpleMode">
-        <div class="card-header">Quick Prompt Generator</div>
-        <div class="card-body">
-            <div class="alert alert-primary">
-                Simply describe what you want to generate, and we'll create optimized prompts for you
-            </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Tab navigation
+            const tabLinks = document.querySelectorAll('#tools a');
+            const tabContents = document.querySelectorAll('.main-content > div');
             
-            <div class="mb-3">
-                <label for="naturalPromptInput" class="form-label">Natural Language Description</label>
-                <textarea class="form-control" id="naturalPromptInput" rows="3" placeholder="Describe what you want to generate, e.g., 'a beautiful mountain landscape with a lake at sunset'"></textarea>
-            </div>
+            tabLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const tab = this.getAttribute('data-tab');
+                    
+                    // Deactivate all tabs
+                    tabLinks.forEach(l => l.classList.remove('active'));
+                    tabContents.forEach(c => c.classList.remove('active'));
+                    
+                    // Activate selected tab
+                    this.classList.add('active');
+                    document.getElementById(tab).classList.add('active');
+                });
+            });
             
-            <div class="row mb-3">
-                <div class="col-md-6">
-                    <label class="form-label">Model</label>
-                    <select class="form-select" id="quickModelSelect">
-                        <option value="sdxl">Stable Diffusion XL</option>
-                        <option value="sd15">Stable Diffusion 1.5</option>
-                        <option value="sd21">Stable Diffusion 2.1</option>
-                    </select>
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">Style Preference</label>
-                    <select class="form-select" id="stylePreference">
-                        <option value="photorealistic">Photorealistic</option>
-                        <option value="artistic">Artistic</option>
-                        <option value="cinematic">Cinematic</option>
-                        <option value="anime">Anime</option>
-                        <option value="fantasy">Fantasy</option>
-                    </select>
-                </div>
-            </div>
-            
-            <div class="d-grid gap-2">
-                <button class="btn btn-primary btn-lg" id="quickGenerateBtn">Generate Prompts</button>
-            </div>
-            
-            <div id="quickResults" style="display: none;">
-                <div class="row mt-4">
-                    <div class="col-md-6">
-                        <div class="card h-100">
-                            <div class="card-header d-flex justify-content-between align-items-center">
-                                <span>Positive Prompt</span>
-                                <button class="btn btn-sm btn-outline-primary" id="copyQuickPromptBtn">Copy</button>
-                            </div>
-                            <div class="card-body">
-                                <div class="preview-box" id="quickPromptOutput"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="card h-100">
-                            <div class="card-header d-flex justify-content-between align-items-center">
-                                <span>Negative Prompt</span>
-                                <button class="btn btn-sm btn-outline-primary" id="copyQuickNegativeBtn">Copy</button>
-                            </div>
-                            <div class="card-body">
-                                <div class="preview-box" id="quickNegativeOutput"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="alert alert-success mt-3">
-                    <strong>Recommended Parameters</strong>
-                    <div id="quickParameters"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="js/data.js"></script>
-    <script src="js/app.js"></script>
+            // Model selection
+            const modelButtons = document.querySelectorAll('.model-button');
+            modelButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Remove active class from all buttons
+                    const container = this.closest('.model-selector');
+                    container.querySelectorAll('.model-button').forEach(b => b.classList.remove('active'));
+                    
+                    // Add active class to clicked button
+                    this.classList.add('active');
+                    
+                    // Show model information
+                    const model = this.getAttribute('data-model');
+                    const modelInfo = {
+                        sdxl: "Less reliant on explicit quality terms, handles longer contexts better, more literal interpretation",
+                        sd15: "Needs explicit quality enhancers, benefits from artist references, responds well to emphasis",
+                        sd21: "Improved text generation, more literal interpretation of prompts",
+                        juggernautxl: "Exceptional for photorealistic portraits, fine-tuned on 15,000 recaptioned images",
+                        fluxdev: "Excels at realistic image generation and accurate text incorporation within images",
+                        juggernautfluxpro: "Superior visual fidelity with enhanced sharpness, detail, contrast, and natural skin textures",
+                        fluxpro: "Enhanced version optimized for professional use cases with improved detail rendering",
+                        sdxlfilm: "LoRA that adds authentic film photography aesthetics with realistic film grain and color profiles"
+                    };
+                    document.getElementById('model-specific-info').innerHTML = `<p><strong>${model.toUpperCase()} Notes:</strong> ${modelInfo[model]}</p>`;
+                });
+            });
+        });
+    </script>
 </body>
 </html>
